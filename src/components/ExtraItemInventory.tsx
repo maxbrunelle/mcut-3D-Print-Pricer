@@ -168,7 +168,7 @@ export function ExtraItemInventory() {
                         type="text" 
                         value={formState.name} 
                         onChange={e => setFormState({...formState, name: e.target.value})}
-                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         placeholder="e.g. Keychain Ring"
                       />
                     </div>
@@ -179,7 +179,7 @@ export function ExtraItemInventory() {
                         type="number" 
                         value={formState.price === 0 ? '' : formState.price} 
                         onChange={e => setFormState({...formState, price: parseFloat(e.target.value) || 0})}
-                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         step="0.01"
                       />
                     </div>
@@ -190,7 +190,7 @@ export function ExtraItemInventory() {
                         type="number" 
                         value={formState.quantity === 0 && !editingItemId ? '' : formState.quantity} 
                         onChange={e => setFormState({...formState, quantity: parseInt(e.target.value, 10) || 0})}
-                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         placeholder="e.g. 50"
                       />
                     </div>
@@ -201,7 +201,7 @@ export function ExtraItemInventory() {
                         type="url" 
                         value={formState.rebuyLink || ''} 
                         onChange={e => setFormState({...formState, rebuyLink: e.target.value})}
-                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         placeholder="https://amazon.com/..."
                       />
                     </div>

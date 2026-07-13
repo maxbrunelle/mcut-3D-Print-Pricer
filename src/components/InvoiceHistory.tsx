@@ -11,6 +11,7 @@ export function InvoiceHistory() {
     if (e) e.stopPropagation();
     
     let inventoryUpdate = [...(state.inventoryExtraItems || [])];
+    let spoolsUpdate = [...(state.spools || [])];
     
     const updatedInvoices = invoices.map(inv => {
       if (inv.id === id) {
@@ -18,6 +19,7 @@ export function InvoiceHistory() {
         
         // If moving to Completed from something else
         if (newStatus === 'Completed' && oldStatus !== 'Completed') {
+          // Deduct extra items
           inv.extraItems?.forEach(item => {
             if (item.inventoryItemId) {
               const invIndex = inventoryUpdate.findIndex(i => i.id === item.inventoryItemId);
@@ -29,9 +31,21 @@ export function InvoiceHistory() {
               }
             }
           });
+          
+          // Deduct filament spools
+          inv.spoolDeductions?.forEach(deduction => {
+            const spoolIndex = spoolsUpdate.findIndex(s => s.id === deduction.spoolId);
+            if (spoolIndex !== -1) {
+              spoolsUpdate[spoolIndex] = {
+                ...spoolsUpdate[spoolIndex],
+                remainingWeight: Math.max(0, (spoolsUpdate[spoolIndex].remainingWeight || 0) - deduction.weightUsed)
+              };
+            }
+          });
         }
         // If moving away from Completed to something else
         else if (oldStatus === 'Completed' && newStatus !== 'Completed') {
+          // Add back extra items
           inv.extraItems?.forEach(item => {
             if (item.inventoryItemId) {
               const invIndex = inventoryUpdate.findIndex(i => i.id === item.inventoryItemId);
@@ -43,6 +57,17 @@ export function InvoiceHistory() {
               }
             }
           });
+          
+          // Add back filament spools
+          inv.spoolDeductions?.forEach(deduction => {
+            const spoolIndex = spoolsUpdate.findIndex(s => s.id === deduction.spoolId);
+            if (spoolIndex !== -1) {
+              spoolsUpdate[spoolIndex] = {
+                ...spoolsUpdate[spoolIndex],
+                remainingWeight: (spoolsUpdate[spoolIndex].remainingWeight || 0) + deduction.weightUsed
+              };
+            }
+          });
         }
         
         return { ...inv, status: newStatus };
@@ -52,7 +77,8 @@ export function InvoiceHistory() {
 
     updateState({ 
       invoices: updatedInvoices,
-      inventoryExtraItems: inventoryUpdate 
+      inventoryExtraItems: inventoryUpdate,
+      spools: spoolsUpdate
     });
   };
 

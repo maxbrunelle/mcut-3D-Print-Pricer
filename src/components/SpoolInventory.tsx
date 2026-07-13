@@ -110,7 +110,7 @@ export function SpoolInventory() {
                         type="text" 
                         value={formState.name} 
                         onChange={e => setFormState({ ...formState, name: e.target.value })} 
-                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         placeholder="e.g. PolyTerra"
                       />
                     </div>
@@ -120,7 +120,7 @@ export function SpoolInventory() {
                         <select 
                           value={formState.material} 
                           onChange={e => setFormState({ ...formState, material: e.target.value })} 
-                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all appearance-none text-slate-800 dark:text-white"
+                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all appearance-none text-slate-800 dark:text-white"
                         >
                           <option>PLA</option>
                           <option>PETG</option>
@@ -136,7 +136,7 @@ export function SpoolInventory() {
                           type="text" 
                           value={formState.color} 
                           onChange={e => setFormState({ ...formState, color: e.target.value })} 
-                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         />
                       </div>
                     </div>
@@ -159,7 +159,7 @@ export function SpoolInventory() {
                           type="number" 
                           value={formState.originalWeight} 
                           onChange={e => setFormState({ ...formState, originalWeight: parseFloat(e.target.value) || 0 })} 
-                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         />
                       </div>
                       <div>
@@ -168,7 +168,7 @@ export function SpoolInventory() {
                           type="number" 
                           value={formState.remainingWeight} 
                           onChange={e => setFormState({ ...formState, remainingWeight: parseFloat(e.target.value) || 0 })} 
-                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                         />
                       </div>
                     </div>
@@ -179,7 +179,7 @@ export function SpoolInventory() {
                         step="0.01"
                         value={formState.cost} 
                         onChange={e => setFormState({ ...formState, cost: parseFloat(e.target.value) || 0 })} 
-                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all text-slate-800 dark:text-white"
                       />
                     </div>
                   </div>

@@ -203,7 +203,7 @@ export function Settings() {
             <div className="mt-8 pt-4 border-t border-white/40 dark:border-slate-700/40 flex justify-end">
               <button
                 onClick={() => setIsOpen(false)}
-                className="px-6 py-2.5 bg-slate-800 dark:bg-slate-100 hover:bg-slate-900 dark:bg-slate-200 text-white rounded-xl font-medium transition-all shadow-md active:scale-95"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/60 dark:bg-slate-800/60 hover:bg-white/80 dark:hover:bg-slate-700/80 border border-white/60 dark:border-slate-700/60 shadow-[0_4px_12px_rgba(255,255,255,0.2)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)] text-slate-800 dark:text-slate-100 rounded-2xl font-bold transition-all duration-300 backdrop-blur-sm"
               >
                 Close
               </button>

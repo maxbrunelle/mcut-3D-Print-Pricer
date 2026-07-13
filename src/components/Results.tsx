@@ -378,21 +378,8 @@ export function Results() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      const selectedCustomer = state.customers.find(c => c.id === state.selectedCustomerId);
-      const newInvoice = {
-        id: Date.now().toString(),
-        invoiceNumber,
-        date: new Date().toISOString(),
-        partName: state.projectName || 'New Project',
-        customerName: selectedCustomer ? selectedCustomer.name : 'Unknown Customer',
-        totalAmount: batchTotal,
-        pdfDataUri: `data:application/pdf;base64,${base64}`,
-        extraItems: state.extraItems
-      };
-      
-      let spoolsUpdate = state.spools || [];
-      
       // Calculate total weight used per spool across all parts
+      const spoolDeductions: { spoolId: string; weightUsed: number }[] = [];
       const spoolUsageMap = new Map<string, number>();
       state.parts.forEach(part => {
         part.materials.forEach(m => {
@@ -402,23 +389,26 @@ export function Results() {
           }
         });
       });
-      
-      if (spoolUsageMap.size > 0 && window.confirm("Deduct printed material weight from your spool inventory?")) {
-        spoolsUpdate = spoolsUpdate.map(spool => {
-          const usedWeight = spoolUsageMap.get(spool.id);
-          if (usedWeight) {
-            return {
-              ...spool,
-              remainingWeight: Math.max(0, spool.remainingWeight - usedWeight)
-            };
-          }
-          return spool;
-        });
-      }
+      spoolUsageMap.forEach((weightUsed, spoolId) => {
+        spoolDeductions.push({ spoolId, weightUsed });
+      });
+
+      const selectedCustomer = state.customers.find(c => c.id === state.selectedCustomerId);
+      const newInvoice = {
+        id: Date.now().toString(),
+        invoiceNumber,
+        date: new Date().toISOString(),
+        partName: state.projectName || 'New Project',
+        customerName: selectedCustomer ? selectedCustomer.name : 'Unknown Customer',
+        totalAmount: batchTotal,
+        pdfDataUri: `data:application/pdf;base64,${base64}`,
+        extraItems: state.extraItems,
+        status: 'Quoted' as const,
+        spoolDeductions
+      };
       
       updateState({ 
         invoices: [...(state.invoices || []), newInvoice],
-        spools: spoolsUpdate,
         nextInvoiceNumber: state.nextInvoiceNumber + 1,
         projectName: '',
         parts: [

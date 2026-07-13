@@ -1,3 +1,4 @@
+import { SpoolCombobox } from "./SpoolCombobox";
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppContext, ProjectPart } from '../lib/store';
@@ -217,7 +218,7 @@ export function Calculator() {
         <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">Print Calculator</h2>
         <button 
           onClick={() => fileInputRef.current?.click()}
-          className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:bg-slate-800/70 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300 text-slate-800 dark:text-white"
+          className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:hover:bg-slate-700/50 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300 text-slate-800 dark:text-white"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
           Auto-fill from 3D File
@@ -229,7 +230,7 @@ export function Calculator() {
         {/* PROJECT NAME */}
         <div>
           <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Project Name</label>
-          <input type="text" name="projectName" value={state.projectName} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white" placeholder="e.g. Mechanical Keyboard Case" />
+          <input type="text" name="projectName" value={state.projectName} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" placeholder="e.g. Mechanical Keyboard Case" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -264,7 +265,7 @@ export function Calculator() {
           {/* PRINTER PROFILE */}
           <div className="md:col-span-2">
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Printer Profile</label>
-            <select name="printerProfile" value={state.printerProfile} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 appearance-none cursor-pointer text-slate-800 dark:text-white">
+            <select name="printerProfile" value={state.printerProfile} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 appearance-none cursor-pointer text-slate-800 dark:text-white">
               <option>Generic Printer</option>
               <option>Prusa i3 MK3S+</option>
               <option>Bambu Lab X1C</option>
@@ -326,7 +327,7 @@ export function Calculator() {
                           type="text" 
                           value={part.name} 
                           onChange={(e) => handlePartChange(part.id, 'name', e.target.value)} 
-                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm text-slate-800 dark:text-white"
+                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
                         />
                       </div>
                       <div>
@@ -336,7 +337,7 @@ export function Calculator() {
                           min="1"
                           value={part.quantity || ''} 
                           onChange={(e) => handlePartChange(part.id, 'quantity', parseInt(e.target.value) || 1)} 
-                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm text-slate-800 dark:text-white"
+                          className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
                         />
                       </div>
                     </div>
@@ -389,41 +390,25 @@ export function Calculator() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                               <div>
                                 <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Type/Spool</label>
-                                <select 
-                                  value={mat.spoolId || mat.name} 
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    const spool = state.spools?.find(s => s.id === val);
-                                    if (spool) {
-                                      const costPerKg = spool.originalWeight ? spool.cost / (spool.originalWeight / 1000) : 0;
+                                <SpoolCombobox 
+                                  value={mat.spoolId || mat.name}
+                                  spools={state.spools || []}
+                                  onChange={(spoolId, name, costPerKg) => {
+                                    if (spoolId) {
                                       handlePartMaterialUpdate(part.id, mat.id, { 
-                                        spoolId: spool.id, 
-                                        name: `${spool.material} - ${spool.name}`,
+                                        spoolId, 
+                                        name,
                                         costPerKg 
                                       });
                                     } else {
                                       handlePartMaterialUpdate(part.id, mat.id, { 
                                         spoolId: undefined, 
-                                        name: val 
+                                        name 
                                       });
                                     }
-                                  }} 
-                                  className="w-full px-2 py-1.5 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-xs appearance-none cursor-pointer truncate text-slate-800 dark:text-white"
-                                >
-                                  <optgroup label="Standard Types">
-                                    <option value="PLA">PLA</option>
-                                    <option value="PETG">PETG</option>
-                                    <option value="ABS">ABS</option>
-                                    <option value="TPU">TPU</option>
-                                  </optgroup>
-                                  {state.spools && state.spools.length > 0 && (
-                                    <optgroup label="Inventory Spools">
-                                      {state.spools.map(s => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                      ))}
-                                    </optgroup>
-                                  )}
-                                </select>
+                                  }}
+                                  className="w-full px-2 py-1.5 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-xs text-slate-800 dark:text-white"
+                                />
                               </div>
                               <div>
                                 <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Cost/KG</label>
@@ -433,7 +418,7 @@ export function Calculator() {
                                     value={mat.costPerKg || ''} 
                                     onChange={(e) => handlePartMaterialChange(part.id, mat.id, 'costPerKg', parseFloat(e.target.value) || 0)} 
                                     disabled={!!mat.spoolId}
-                                    className={`w-full pl-2 pr-7 py-1.5 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-xs text-slate-800 dark:text-white ${mat.spoolId ? 'opacity-70 cursor-not-allowed' : ''}`} 
+                                    className={`w-full pl-2 pr-7 py-1.5 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-xs text-slate-800 dark:text-white ${mat.spoolId ? 'opacity-70 cursor-not-allowed' : ''}`} 
                                   />
                                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">CAD</span>
                                 </div>
@@ -445,7 +430,7 @@ export function Calculator() {
                                     type="number" 
                                     value={mat.weight || ''} 
                                     onChange={(e) => handlePartMaterialChange(part.id, mat.id, 'weight', parseFloat(e.target.value) || 0)} 
-                                    className="w-full pl-2 pr-6 py-1.5 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-xs text-slate-800 dark:text-white" 
+                                    className="w-full pl-2 pr-6 py-1.5 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-xs text-slate-800 dark:text-white" 
                                   />
                                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">g</span>
                                 </div>
@@ -465,7 +450,7 @@ export function Calculator() {
                             type="number" 
                             value={part.printTimeHrs || ''} 
                             onChange={(e) => handlePartChange(part.id, 'printTimeHrs', parseInt(e.target.value) || 0)} 
-                            className="w-full pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all text-sm text-slate-800 dark:text-white" 
+                            className="w-full pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all text-sm text-slate-800 dark:text-white" 
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs">hrs</span>
                         </div>
@@ -474,7 +459,7 @@ export function Calculator() {
                             type="number" 
                             value={part.printTimeMin || ''} 
                             onChange={(e) => handlePartChange(part.id, 'printTimeMin', parseInt(e.target.value) || 0)} 
-                            className="w-full pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all text-sm text-slate-800 dark:text-white" 
+                            className="w-full pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all text-sm text-slate-800 dark:text-white" 
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs">min</span>
                         </div>
@@ -523,7 +508,7 @@ export function Calculator() {
                       type="number" 
                       value={task.timeMin || ''} 
                       onChange={(e) => handlePostProcessingTaskChange(task.id, 'timeMin', parseInt(e.target.value) || 0)}
-                      className="w-full pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-sm text-slate-800 dark:text-white"
+                      className="w-full pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs">min</span>
                   </div>
@@ -556,7 +541,7 @@ export function Calculator() {
               {state.inventoryExtraItems && state.inventoryExtraItems.length > 0 && (
                 <button
                   onClick={() => setShowExtraItemsModal(true)}
-                  className="text-xs text-slate-600 dark:text-slate-300 font-medium hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg border border-white/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:bg-slate-800/70 shadow-sm"
+                  className="text-xs text-slate-600 dark:text-slate-300 font-medium hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg border border-white/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:hover:bg-slate-700/50 shadow-sm"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                   From Inventory
@@ -590,7 +575,7 @@ export function Calculator() {
                       type="number" 
                       value={item.quantity || ''} 
                       onChange={(e) => handleExtraItemChange(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                      className="w-full pl-3 pr-8 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-sm text-slate-800 dark:text-white"
+                      className="w-full pl-3 pr-8 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs">x</span>
                   </div>
@@ -599,7 +584,7 @@ export function Calculator() {
                       type="number" 
                       value={item.price || ''} 
                       onChange={(e) => handleExtraItemChange(item.id, 'price', parseFloat(e.target.value) || 0)}
-                      className="w-full pl-8 pr-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-sm text-slate-800 dark:text-white"
+                      className="w-full pl-8 pr-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
                     />
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-sm">$</span>
                   </div>
@@ -624,7 +609,7 @@ export function Calculator() {
           <div>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Labor Time</label>
             <div className="relative">
-              <input type="number" name="laborTimeMin" value={state.laborTimeMin || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white" />
+              <input type="number" name="laborTimeMin" value={state.laborTimeMin || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-medium text-sm">min</span>
             </div>
           </div>
@@ -668,7 +653,7 @@ export function Calculator() {
           <div>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Hardware Cost</label>
             <div className="relative">
-              <input type="number" name="hardwareCost" value={state.hardwareCost || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white" />
+              <input type="number" name="hardwareCost" value={state.hardwareCost || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-medium text-sm">CAD</span>
             </div>
           </div>
@@ -677,7 +662,7 @@ export function Calculator() {
           <div>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Packaging Cost</label>
             <div className="relative">
-              <input type="number" name="packagingCost" value={state.packagingCost || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white" />
+              <input type="number" name="packagingCost" value={state.packagingCost || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-medium text-sm">CAD</span>
             </div>
           </div>
@@ -686,7 +671,7 @@ export function Calculator() {
           <div>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Shipping Cost</label>
             <div className="relative">
-              <input type="number" name="shippingCost" value={state.shippingCost || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white" />
+              <input type="number" name="shippingCost" value={state.shippingCost || ''} onChange={handleChange} className="w-full pl-4 pr-12 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 font-medium text-sm">CAD</span>
             </div>
           </div>
@@ -699,7 +684,7 @@ export function Calculator() {
                 name="discountType"
                 value={state.discountType}
                 onChange={handleChange}
-                className="w-1/3 pl-3 pr-2 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-l-2xl border-r-0 focus:outline-none focus:ring-2 focus:ring-blue-400/50 appearance-none text-sm font-medium text-slate-800 dark:text-white"
+                className="w-1/3 pl-3 pr-2 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-l-2xl border-r-0 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 appearance-none text-sm font-medium text-slate-800 dark:text-white"
               >
                 <option value="percentage">%</option>
                 <option value="fixed">$</option>
@@ -709,7 +694,7 @@ export function Calculator() {
                 name="discountValue" 
                 value={state.discountValue || ''} 
                 onChange={handleChange} 
-                className="w-2/3 pl-4 pr-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-r-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white" 
+                className="w-2/3 pl-4 pr-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-r-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" 
               />
             </div>
           </div>
@@ -723,7 +708,7 @@ export function Calculator() {
               name="paymentTerms"
               value={state.paymentTerms}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all duration-300 appearance-none text-slate-800 dark:text-white"
+              className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 appearance-none text-slate-800 dark:text-white"
             >
               <option value="Due on Receipt">Due on Receipt</option>
               <option value="Net 15">Net 15</option>
@@ -740,7 +725,7 @@ export function Calculator() {
               value={state.invoiceNotes || ''}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 resize-none text-sm text-slate-800 dark:text-white"
+              className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 resize-none text-sm text-slate-800 dark:text-white"
               placeholder="Thank you for your business!..."
             ></textarea>
           </div>
@@ -761,31 +746,31 @@ export function Calculator() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Electricity Cost ($/kWh)</label>
-                  <input type="number" step="0.01" name="electricityCost" value={state.electricityCost} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
+                  <input type="number" step="0.01" name="electricityCost" value={state.electricityCost} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Printer Power (W)</label>
-                  <input type="number" name="printerPower" value={state.printerPower} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
+                  <input type="number" name="printerPower" value={state.printerPower} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Labor Rate ($/hr)</label>
-                  <input type="number" name="laborRatePerHour" value={state.laborRatePerHour} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
+                  <input type="number" name="laborRatePerHour" value={state.laborRatePerHour} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Failure Rate (%)</label>
-                  <input type="number" name="failureRate" value={state.failureRate} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
+                  <input type="number" name="failureRate" value={state.failureRate} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Printer Cost ($)</label>
-                  <input type="number" name="printerCost" value={state.printerCost} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
+                  <input type="number" name="printerCost" value={state.printerCost} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Printer Lifespan (hrs)</label>
-                  <input type="number" name="printerLifespanHours" value={state.printerLifespanHours} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
+                  <input type="number" name="printerLifespanHours" value={state.printerLifespanHours} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div className="col-span-1 md:col-span-2">
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Markup (%)</label>
-                  <input type="number" name="markupPercentage" value={state.markupPercentage} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
+                  <input type="number" name="markupPercentage" value={state.markupPercentage} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
               </div>
             </div>
@@ -826,7 +811,7 @@ export function Calculator() {
                   value={newCustomerName} 
                   onChange={e => setNewCustomerName(e.target.value)} 
                   autoFocus
-                  className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white"
+                  className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white"
                   placeholder="John Doe" 
                 />
               </div>
@@ -836,7 +821,7 @@ export function Calculator() {
                   type="text"
                   value={newCustomerStreet} 
                   onChange={e => setNewCustomerStreet(e.target.value)} 
-                  className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white"
+                  className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white"
                   placeholder="123 3D Street" 
                 />
               </div>
@@ -847,7 +832,7 @@ export function Calculator() {
                     type="text"
                     value={newCustomerCity} 
                     onChange={e => setNewCustomerCity(e.target.value)} 
-                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white"
+                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white"
                     placeholder="Maker City" 
                   />
                 </div>
@@ -857,7 +842,7 @@ export function Calculator() {
                     type="text"
                     value={newCustomerState} 
                     onChange={e => setNewCustomerState(e.target.value)} 
-                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white"
+                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white"
                     placeholder="Quebec" 
                   />
                 </div>
@@ -869,7 +854,7 @@ export function Calculator() {
                     type="text"
                     value={newCustomerZip} 
                     onChange={e => setNewCustomerZip(e.target.value)} 
-                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white"
+                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white"
                     placeholder="H3Z 2Y7" 
                   />
                 </div>
@@ -879,7 +864,7 @@ export function Calculator() {
                     type="text"
                     value={newCustomerCountry} 
                     onChange={e => setNewCustomerCountry(e.target.value)} 
-                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:bg-slate-800/70 transition-all duration-300 text-slate-800 dark:text-white"
+                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white"
                     placeholder="Canada" 
                   />
                 </div>
@@ -1059,7 +1044,7 @@ export function Calculator() {
                     addInventoryExtraItem(item.id);
                     setShowExtraItemsModal(false);
                   }}
-                  className="bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-sm hover:bg-white/70 dark:bg-slate-800/70 hover:border-purple-300 p-4 rounded-2xl flex justify-between items-center transition-all text-left group"
+                  className="bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-sm hover:bg-white/70 dark:hover:bg-slate-700/50 hover:border-purple-300 p-4 rounded-2xl flex justify-between items-center transition-all text-left group"
                 >
                   <div>
                     <div className="font-bold text-slate-800 dark:text-slate-100">{item.name}</div>

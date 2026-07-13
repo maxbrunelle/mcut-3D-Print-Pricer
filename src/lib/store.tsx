@@ -30,6 +30,11 @@ export interface Spool {
   cost: number;
 }
 
+export interface SpoolDeduction {
+  spoolId: string;
+  weightUsed: number;
+}
+
 export interface Invoice {
   id: string;
   invoiceNumber?: string;
@@ -40,6 +45,7 @@ export interface Invoice {
   pdfDataUri: string;
   status?: 'Quoted' | 'Printing' | 'Post-Processing' | 'Completed';
   extraItems?: ExtraItem[];
+  spoolDeductions?: SpoolDeduction[];
 }
 
 export interface ProjectPart {
