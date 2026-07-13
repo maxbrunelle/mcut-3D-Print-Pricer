@@ -26,7 +26,7 @@ export function GoogleDriveSync() {
         setUser(res.user);
       }
     } catch (e) {
-      alert('Failed to sign in to Google');
+      alert('Failed to sign in to Google.\n\nIf you are using the AI Studio preview, please open the app in a new tab (using the button in the top right corner) to sign in, as popups may be blocked in the embedded view.\n\nIf the problem persists, ensure your Firebase domain is authorized.');
     } finally {
       setLoading(false);
     }
