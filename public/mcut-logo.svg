@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 100">
+  <style>
+    .text { font-family: 'Arial Black', sans-serif; font-weight: 900; font-size: 70px; fill: #484b9e; letter-spacing: -2px; }
+    .dot { fill: #bed676; }
+  </style>
+  <text x="0" y="70" class="text">mcut</text>
+  <circle cx="195" cy="30" r="12" class="dot" />
+</svg>

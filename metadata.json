@@ -1,0 +1,6 @@
+{
+  "name": "3D Print Pricer",
+  "description": "Estimate 3D printing costs, manage materials, and export invoices as PDF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

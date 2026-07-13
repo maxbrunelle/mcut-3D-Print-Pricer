@@ -1,0 +1,208 @@
+import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { useAppContext } from '../lib/store';
+import { Settings as SettingsIcon, Upload, X, Download, FileUp, Palette } from 'lucide-react';
+import { THEMES } from '../App';
+
+export function Settings() {
+  const { state, updateState } = useAppContext();
+  const [isOpen, setIsOpen] = useState(false);
+  const appLogoInputRef = useRef<HTMLInputElement>(null);
+  const invoiceLogoInputRef = useRef<HTMLInputElement>(null);
+  const backupInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = (type: 'appLogo' | 'invoiceLogo') => async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target && typeof event.target.result === 'string') {
+          updateState({ [type]: event.target.result });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeLogo = (type: 'appLogo' | 'invoiceLogo') => {
+    updateState({ [type]: null });
+  };
+
+  const exportBackup = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `3d-pricer-backup-${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const importBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target?.result as string);
+          if (window.confirm('Are you sure you want to restore this backup? This will overwrite all your current data.')) {
+            updateState(parsed);
+            alert('Backup restored successfully!');
+          }
+        } catch (err) {
+          alert('Invalid backup file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  return (
+    <>
+      <button 
+        onClick={() => setIsOpen(true)}
+        className="p-2 text-slate-500 hover:text-slate-800 bg-white/50 hover:bg-white/80 rounded-full transition-colors drop-shadow-sm border border-white/60"
+        title="Settings"
+      >
+        <SettingsIcon size={20} />
+      </button>
+
+      {isOpen && createPortal(
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-md max-h-[90vh] overflow-y-auto flex flex-col custom-scrollbar">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-800 drop-shadow-sm flex items-center gap-2">
+                <SettingsIcon size={24} className="text-blue-500" /> Settings
+              </h3>
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="text-slate-500 hover:text-slate-800 transition-colors p-2 rounded-full hover:bg-white/50"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* App Theme */}
+              <div className="bg-white/40 p-4 rounded-2xl border border-white/60">
+                <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2"><Palette size={16} /> Theme</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.keys(THEMES).map((themeKey) => (
+                    <button
+                      key={themeKey}
+                      onClick={() => updateState({ appTheme: themeKey })}
+                      className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${state.appTheme === themeKey ? 'border-blue-500 bg-blue-50/50 shadow-sm' : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50/50'}`}
+                    >
+                      <div className={`w-full h-8 rounded-lg bg-gradient-to-br ${THEMES[themeKey].bg} opacity-80`} />
+                      <span className="text-xs font-medium text-slate-600 capitalize">{themeKey.replace('-', ' ')}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* App Logo */}
+              <div className="bg-white/40 p-4 rounded-2xl border border-white/60">
+                <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">App Logo</h4>
+                {state.appLogo ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <img src={state.appLogo} alt="App Logo" className="h-16 object-contain" />
+                    <button 
+                      onClick={() => removeLogo('appLogo')}
+                      className="text-xs text-red-500 hover:text-red-700 font-medium"
+                    >
+                      Remove Logo
+                    </button>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => appLogoInputRef.current?.click()}
+                    className="border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
+                  >
+                    <Upload size={20} className="text-slate-400 mb-2" />
+                    <span className="text-xs text-slate-500">Upload App Logo</span>
+                    <input 
+                      type="file" 
+                      ref={appLogoInputRef} 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleLogoUpload('appLogo')}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Invoice Logo */}
+              <div className="bg-white/40 p-4 rounded-2xl border border-white/60">
+                <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">Invoice Logo</h4>
+                {state.invoiceLogo ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <img src={state.invoiceLogo} alt="Invoice Logo" className="h-16 object-contain" />
+                    <button 
+                      onClick={() => removeLogo('invoiceLogo')}
+                      className="text-xs text-red-500 hover:text-red-700 font-medium"
+                    >
+                      Remove Logo
+                    </button>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => invoiceLogoInputRef.current?.click()}
+                    className="border-2 border-dashed border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
+                  >
+                    <Upload size={20} className="text-slate-400 mb-2" />
+                    <span className="text-xs text-slate-500">Upload Invoice Logo</span>
+                    <input 
+                      type="file" 
+                      ref={invoiceLogoInputRef} 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleLogoUpload('invoiceLogo')}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              {/* Data Backup */}
+              <div className="bg-white/40 p-4 rounded-2xl border border-white/60 mt-6">
+                <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">Data Backup</h4>
+                <div className="flex gap-4">
+                  <button
+                    onClick={exportBackup}
+                    className="flex-1 flex flex-col items-center justify-center py-4 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors text-slate-700 shadow-sm"
+                  >
+                    <Download size={20} className="mb-2 text-slate-500" />
+                    <span className="text-xs font-medium">Export JSON</span>
+                  </button>
+                  <button
+                    onClick={() => backupInputRef.current?.click()}
+                    className="flex-1 flex flex-col items-center justify-center py-4 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition-colors text-slate-700 shadow-sm"
+                  >
+                    <FileUp size={20} className="mb-2 text-slate-500" />
+                    <span className="text-xs font-medium">Import JSON</span>
+                  </button>
+                  <input 
+                    type="file" 
+                    ref={backupInputRef} 
+                    className="hidden" 
+                    accept=".json"
+                    onChange={importBackup}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 pt-4 border-t border-white/40 flex justify-end">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-medium transition-all shadow-md active:scale-95"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
+  );
+}
