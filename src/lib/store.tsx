@@ -113,6 +113,7 @@ export interface CalculatorState {
   appLogo: string | null;
   invoiceLogo: string | null;
   appTheme: string;
+  isDarkMode: boolean;
 }
 
 interface AppState {
@@ -189,6 +190,7 @@ const defaultState: CalculatorState = {
   appLogo: null,
   invoiceLogo: null,
   appTheme: 'indigo-cyan',
+  isDarkMode: false,
 };
 
 const STORAGE_KEY = '3d-pricer-state';

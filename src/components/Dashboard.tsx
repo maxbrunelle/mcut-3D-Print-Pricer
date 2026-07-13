@@ -73,7 +73,7 @@ export function Dashboard() {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="text-sm bg-white/50 hover:bg-white/70 border border-white/40 shadow-sm text-slate-700 px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 backdrop-blur-md font-medium"
+        className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:bg-slate-800/70 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 backdrop-blur-md font-medium"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
         Analytics Dashboard
@@ -81,15 +81,15 @@ export function Dashboard() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-6xl max-h-[90vh] flex flex-col">
+          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-6xl max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-2 text-slate-800 drop-shadow-sm">
+              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 drop-shadow-sm">Business Analytics</h2>
+                <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Business Analytics</h2>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="text-slate-500 hover:text-slate-800 transition-colors p-2 rounded-full hover:bg-white/50"
+                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
               </button>
@@ -103,36 +103,36 @@ export function Dashboard() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     Total Quoted
                   </span>
-                  <span className="text-3xl font-black text-slate-800">${totalRevenue.toFixed(2)}</span>
+                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">${totalRevenue.toFixed(2)}</span>
                 </div>
                 <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-5 flex flex-col justify-center">
                   <span className="text-emerald-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
                     Completed Revenue
                   </span>
-                  <span className="text-3xl font-black text-slate-800">${completedRevenue.toFixed(2)}</span>
+                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">${completedRevenue.toFixed(2)}</span>
                 </div>
                 <div className="bg-purple-50/50 border border-purple-100 rounded-2xl p-5 flex flex-col justify-center">
                   <span className="text-purple-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                     Total Jobs
                   </span>
-                  <span className="text-3xl font-black text-slate-800">{totalJobs}</span>
+                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">{totalJobs}</span>
                 </div>
                 <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-5 flex flex-col justify-center">
                   <span className="text-amber-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
                     Avg. Job Value
                   </span>
-                  <span className="text-3xl font-black text-slate-800">${averageJobValue.toFixed(2)}</span>
+                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">${averageJobValue.toFixed(2)}</span>
                 </div>
               </div>
 
               {/* Charts Row */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Revenue Chart */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                  <h3 className="font-bold text-slate-700 mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+                  <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
                     Revenue (Last 6 Months)
                   </h3>
@@ -159,8 +159,8 @@ export function Dashboard() {
                 </div>
 
                 {/* Status Distribution */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                  <h3 className="font-bold text-slate-700 mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+                  <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
                     Jobs by Status
                   </h3>
@@ -199,8 +199,8 @@ export function Dashboard() {
 
               {/* Jobs Bar Chart & Top Customers */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm lg:col-span-2">
-                  <h3 className="font-bold text-slate-700 mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm lg:col-span-2">
+                  <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-4"/></svg>
                     Job Volume (Last 6 Months)
                   </h3>
@@ -220,8 +220,8 @@ export function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
-                  <h3 className="font-bold text-slate-700 mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex flex-col">
+                  <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     Top Customers
                   </h3>
@@ -240,10 +240,10 @@ export function Dashboard() {
                       .map((cust, idx) => (
                         <div key={idx} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
                           <div>
-                            <div className="font-medium text-slate-800 text-sm">{cust.name}</div>
-                            <div className="text-xs text-slate-500">{cust.jobs} job{cust.jobs !== 1 ? 's' : ''}</div>
+                            <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">{cust.name}</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">{cust.jobs} job{cust.jobs !== 1 ? 's' : ''}</div>
                           </div>
-                          <div className="font-bold text-slate-700 text-sm">${cust.revenue.toFixed(2)}</div>
+                          <div className="font-bold text-slate-700 dark:text-slate-200 text-sm">${cust.revenue.toFixed(2)}</div>
                         </div>
                       ))}
                       {invoices.length === 0 && (

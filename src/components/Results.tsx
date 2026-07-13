@@ -464,10 +464,10 @@ export function Results() {
   ];
 
   return (
-    <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/40 p-6 md:p-8">
+    <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/40 dark:border-slate-700/40 p-6 md:p-8">
       <div className="flex items-center gap-2 mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-800 drop-shadow-sm"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-        <h2 className="text-lg font-bold uppercase tracking-widest text-slate-800 drop-shadow-sm">Suggested Pricing</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-800 dark:text-slate-100 drop-shadow-sm"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        <h2 className="text-lg font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Suggested Pricing</h2>
       </div>
 
       <div className="space-y-4">
@@ -481,15 +481,15 @@ export function Results() {
               className={`p-5 rounded-3xl cursor-pointer transition-all duration-300 ${tier.color} ${isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-blue-200/50 shadow-lg scale-[1.02]' : 'hover:scale-[1.01] hover:shadow-md'}`}
             >
               <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2 text-slate-800 drop-shadow-sm">
+                <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
                   {tier.icon}
                   <span className="font-medium text-lg">{tier.name}</span>
                 </div>
-                <div className="text-2xl font-bold text-slate-900">
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">
                   ${finalTotal.toFixed(2)}
                 </div>
               </div>
-              <div className="flex justify-between items-center text-sm text-slate-600">
+              <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-300">
                 <span>+{tier.margin}% profit margin</span>
                 {state.applyTaxes ? (
                   <span>${calculatePreTax(tier.margin).toFixed(2)} pre-tax</span>
@@ -504,14 +504,14 @@ export function Results() {
         {/* Custom Tier */}
         <div 
           onClick={() => updateState({ selectedMargin: state.customMargin })}
-          className={`p-5 rounded-3xl bg-white/40 backdrop-blur-md border border-white/50 cursor-pointer transition-all duration-300 ${activeMargin === state.customMargin && !pricingTiers.find(t => t.margin === state.customMargin) ? 'ring-2 ring-white ring-offset-2 ring-offset-blue-200/50 shadow-lg scale-[1.02]' : 'hover:scale-[1.01] hover:shadow-md'}`}
+          className={`p-5 rounded-3xl bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/50 dark:border-slate-700/50 cursor-pointer transition-all duration-300 ${activeMargin === state.customMargin && !pricingTiers.find(t => t.margin === state.customMargin) ? 'ring-2 ring-white ring-offset-2 ring-offset-blue-200/50 shadow-lg scale-[1.02]' : 'hover:scale-[1.01] hover:shadow-md'}`}
         >
           <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-2 text-slate-800 drop-shadow-sm">
+            <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
               <span className="font-medium text-lg">Custom</span>
             </div>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">
               ${calculateTotal(state.customMargin).toFixed(2)}
             </div>
           </div>
@@ -523,20 +523,20 @@ export function Results() {
               max="200" 
               value={state.customMargin} 
               onChange={handleCustomMarginChange}
-              className="flex-1 h-2 bg-white/50 rounded-lg appearance-none cursor-pointer accent-blue-500 shadow-inner"
+              className="flex-1 h-2 bg-white/50 dark:bg-slate-800/50 rounded-lg appearance-none cursor-pointer accent-blue-500 shadow-inner text-slate-800 dark:text-white"
             />
-            <div className="flex items-center bg-white/60 backdrop-blur-sm border border-white/60 rounded-xl px-2 py-1 shadow-inner">
+            <div className="flex items-center bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-white/60 dark:border-slate-700/60 rounded-xl px-2 py-1 shadow-inner">
               <input 
                 type="number" 
                 value={state.customMargin} 
                 onChange={handleCustomMarginChange}
-                className="w-12 text-center bg-transparent focus:outline-none text-slate-900 font-medium"
+                className="w-12 text-center bg-transparent focus:outline-none font-medium text-slate-800 dark:text-white"
               />
-              <span className="text-slate-600 text-sm">%</span>
+              <span className="text-slate-600 dark:text-slate-300 text-sm">%</span>
             </div>
           </div>
 
-          <div className="flex justify-between items-center text-sm text-slate-600">
+          <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-300">
             <span>+{state.customMargin}% profit margin</span>
             {state.applyTaxes ? (
               <span>${calculatePreTax(state.customMargin).toFixed(2)} pre-tax</span>
@@ -547,9 +547,9 @@ export function Results() {
         </div>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-white/40 flex flex-col items-stretch gap-4">
-        <div className="flex justify-between items-center text-sm text-slate-700 px-2 drop-shadow-sm">
-          <span>Total Project: <span className="font-bold text-slate-900">${unitTotal.toFixed(2)} {state.applyTaxes ? 'incl. taxes' : 'pre-tax'}</span></span>
+      <div className="mt-8 pt-6 border-t border-white/40 dark:border-slate-700/40 flex flex-col items-stretch gap-4">
+        <div className="flex justify-between items-center text-sm text-slate-700 dark:text-slate-200 px-2 drop-shadow-sm">
+          <span>Total Project: <span className="font-bold text-slate-900 dark:text-slate-50">${unitTotal.toFixed(2)} {state.applyTaxes ? 'incl. taxes' : 'pre-tax'}</span></span>
           <span>{activeMargin}% profit margin</span>
         </div>
         
@@ -557,7 +557,7 @@ export function Results() {
           <button 
             onClick={savePdfLocal}
             disabled={isSyncing}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white/60 hover:bg-white/80 border border-white/60 shadow-[0_4px_12px_rgba(255,255,255,0.2)] text-slate-800 rounded-2xl font-bold transition-all duration-300 backdrop-blur-sm"
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white/60 dark:bg-slate-800/60 hover:bg-white/80 dark:bg-slate-800/80 border border-white/60 dark:border-slate-700/60 shadow-[0_4px_12px_rgba(255,255,255,0.2)] text-slate-800 dark:text-slate-100 rounded-2xl font-bold transition-all duration-300 backdrop-blur-sm"
           >
             {isSyncing ? (
               <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -595,7 +595,7 @@ export function Results() {
                   console.error('Error sharing:', error);
                 }
               }}
-              className="flex-none flex items-center justify-center w-12 h-12 bg-white/60 hover:bg-white/80 border border-white/60 shadow-[0_4px_12px_rgba(255,255,255,0.2)] text-slate-800 rounded-2xl transition-all duration-300 backdrop-blur-sm"
+              className="flex-none flex items-center justify-center w-12 h-12 bg-white/60 dark:bg-slate-800/60 hover:bg-white/80 dark:bg-slate-800/80 border border-white/60 dark:border-slate-700/60 shadow-[0_4px_12px_rgba(255,255,255,0.2)] text-slate-800 dark:text-slate-100 rounded-2xl transition-all duration-300 backdrop-blur-sm"
               aria-label="Share Quote"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>

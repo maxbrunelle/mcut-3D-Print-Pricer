@@ -94,7 +94,7 @@ export function InvoiceHistory() {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="text-sm bg-white/50 hover:bg-white/70 border border-white/40 shadow-sm text-slate-700 px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 backdrop-blur-md font-medium"
+        className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:bg-slate-800/70 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 backdrop-blur-md font-medium"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
         Job Tracker ({invoices.length})
@@ -102,22 +102,22 @@ export function InvoiceHistory() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-[1400px] h-[90vh] flex flex-col">
+          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-[1400px] h-[90vh] flex flex-col">
             <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-2 text-slate-800 drop-shadow-sm">
+              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
-                <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 drop-shadow-sm">Job Tracker</h2>
+                <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Job Tracker</h2>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="text-slate-500 hover:text-slate-800 transition-colors p-2 rounded-full hover:bg-white/50"
+                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
               </button>
             </div>
 
             {invoices.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 flex-1 flex flex-col items-center justify-center bg-white/30 backdrop-blur-md rounded-2xl border border-white/40 border-dashed">
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400 flex-1 flex flex-col items-center justify-center bg-white/30 dark:bg-slate-800/40 dark:bg-slate-800/40 backdrop-blur-md rounded-2xl border border-white/40 dark:border-slate-700/60 border-dashed">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 opacity-50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
                 <p>No jobs found.</p>
                 <p className="text-sm mt-1">Save a quote to see it appear here.</p>
@@ -130,13 +130,13 @@ export function InvoiceHistory() {
                   return (
                     <div 
                       key={column} 
-                      className="bg-white/30 backdrop-blur-md border border-white/40 rounded-2xl flex flex-col min-h-[300px]"
+                      className="bg-white/30 dark:bg-slate-800/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/40 dark:border-slate-700/60 rounded-2xl flex flex-col min-h-[300px]"
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, column)}
                     >
-                      <div className="p-4 font-bold text-slate-700 flex justify-between items-center border-b border-white/40">
+                      <div className="p-4 font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center border-b border-white/40 dark:border-slate-700/40">
                         {column}
-                        <span className="bg-white/60 shadow-sm border border-white/80 text-slate-700 text-xs px-2 py-1 rounded-full">
+                        <span className="bg-white/60 dark:bg-slate-800/60 shadow-sm border border-white/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 text-xs px-2 py-1 rounded-full">
                           {columnInvoices.length}
                         </span>
                       </div>
@@ -146,11 +146,11 @@ export function InvoiceHistory() {
                             key={inv.id} 
                             draggable
                             onDragStart={(e) => handleDragStart(e, inv.id)}
-                            className="bg-white/60 border border-white/80 shadow-sm rounded-xl p-4 flex flex-col gap-3 transition-all duration-300 hover:bg-white/90 hover:border-blue-300 hover:shadow-md cursor-grab active:cursor-grabbing group"
+                            className="bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/80 shadow-sm rounded-xl p-4 flex flex-col gap-3 transition-all duration-300 hover:bg-white/90 hover:border-blue-300 hover:shadow-md cursor-grab active:cursor-grabbing group"
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2 mb-1">
-                                <h3 className="font-bold text-slate-800 leading-tight">{inv.partName}</h3>
+                                <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{inv.partName}</h3>
                                 <button 
                                   onClick={(e) => handleDelete(inv.id, e)}
                                   className="p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors opacity-0 group-hover:opacity-100"
@@ -162,17 +162,17 @@ export function InvoiceHistory() {
                               <div className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 inline-block mb-2">
                                 {inv.customerName}
                               </div>
-                              <div className="text-xs text-slate-500 flex justify-between items-center">
+                              <div className="text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center">
                                 <span>{new Date(inv.date).toLocaleDateString()}</span>
-                                <span className="font-bold text-slate-700">${inv.totalAmount.toFixed(2)}</span>
+                                <span className="font-bold text-slate-700 dark:text-slate-200">${inv.totalAmount.toFixed(2)}</span>
                               </div>
                             </div>
                             
-                            <div className="pt-3 border-t border-white/60 flex items-center justify-between gap-2">
+                            <div className="pt-3 border-t border-white/60 dark:border-slate-700/60 flex items-center justify-between gap-2">
                               <select
                                 value={inv.status || 'Quoted'}
                                 onChange={(e) => handleStatusChange(inv.id, e.target.value as any, e)}
-                                className="text-xs font-semibold px-2 py-1 rounded-md border border-white/60 shadow-sm focus:ring-1 focus:ring-blue-400 outline-none cursor-pointer appearance-none bg-white/50 text-slate-700 flex-1"
+                                className="text-xs font-semibold px-2 py-1 rounded-md border border-white/60 dark:border-slate-700/60 shadow-sm focus:ring-1 focus:ring-blue-400 outline-none cursor-pointer appearance-none bg-white/50 dark:bg-slate-800/50 text-slate-800 dark:text-white flex-1"
                               >
                                 {columns.map(c => <option key={c} value={c}>{c}</option>)}
                               </select>
@@ -186,7 +186,7 @@ export function InvoiceHistory() {
                                       newTab.document.write(`<iframe width="100%" height="100%" src="${inv.pdfDataUri}" frameborder="0"></iframe>`);
                                     }
                                   }}
-                                  className="p-1.5 bg-white/50 hover:bg-white/80 border border-white/60 shadow-sm rounded-md text-slate-600 transition-colors"
+                                  className="p-1.5 bg-white/50 dark:bg-slate-800/50 hover:bg-white/80 dark:bg-slate-800/80 border border-white/60 dark:border-slate-700/60 shadow-sm rounded-md text-slate-600 dark:text-slate-300 transition-colors"
                                   title="View PDF"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
