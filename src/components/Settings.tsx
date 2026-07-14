@@ -183,15 +183,58 @@ export function Settings() {
                                 placeholder="e.g. Acme 3D Printing"
                               />
                             </div>
+
                             <div>
-                              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Company Address</label>
-                              <textarea 
-                                value={state.companyAddress || ''}
-                                onChange={e => updateState({ companyAddress: e.target.value })}
-                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm h-20 resize-none custom-scrollbar"
-                                placeholder="123 Main St, City, Country"
+                              <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Street Address</label>
+                              <input 
+                                type="text" 
+                                value={state.companyStreet || ''}
+                                onChange={e => updateState({ companyStreet: e.target.value })}
+                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                                placeholder="123 Main St"
                               />
                             </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">City</label>
+                                <input 
+                                  type="text" 
+                                  value={state.companyCity || ''}
+                                  onChange={e => updateState({ companyCity: e.target.value })}
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">State / Province</label>
+                                <input 
+                                  type="text" 
+                                  value={state.companyState || ''}
+                                  onChange={e => updateState({ companyState: e.target.value })}
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">ZIP / Postal Code</label>
+                                <input 
+                                  type="text" 
+                                  value={state.companyZip || ''}
+                                  onChange={e => updateState({ companyZip: e.target.value })}
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Country</label>
+                                <input 
+                                  type="text" 
+                                  value={state.companyCountry || ''}
+                                  onChange={e => updateState({ companyCountry: e.target.value })}
+                                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                                />
+                              </div>
+                            </div>
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Email Address</label>

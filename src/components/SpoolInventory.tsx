@@ -138,7 +138,16 @@ export function SpoolInventory() {
                           className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all appearance-none text-slate-800 dark:text-white"
                         >
                           <option>PLA</option>
+                          <option>PLA+</option>
+                          <option>PLA Matte</option>
+                          <option>PLA Silk</option>
+                          <option>PLA Tough</option>
+                          <option>PLA CF</option>
                           <option>PETG</option>
+                          <option>PETG Rapid</option>
+                          <option>PETG CF</option>
+                          <option>PETG Tough</option>
+                          <option>PETG Translucent</option>
                           <option>ABS</option>
                           <option>TPU</option>
                           <option>ASA</option>

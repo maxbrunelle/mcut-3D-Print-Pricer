@@ -209,10 +209,14 @@ export function Results() {
     let fromY = 80;
     doc.text(state.companyName || 'mcut', 110, fromY);
     fromY += 5;
-    if (state.companyAddress) {
-      const addrLines = doc.splitTextToSize(state.companyAddress, 80);
-      doc.text(addrLines, 110, fromY);
-      fromY += (addrLines.length * 5);
+    const hasCompanyAddress = state.companyStreet || state.companyCity || state.companyCountry;
+    if (hasCompanyAddress) {
+      if (state.companyStreet) { doc.text(state.companyStreet, 110, fromY); fromY += 5; }
+      if (state.companyCity || state.companyState || state.companyZip) {
+        const line2 = [state.companyCity, state.companyState, state.companyZip].filter(Boolean).join(', ');
+        doc.text(line2, 110, fromY); fromY += 5;
+      }
+      if (state.companyCountry) { doc.text(state.companyCountry, 110, fromY); fromY += 5; }
     } else {
       doc.text('292 rue Melrose', 110, fromY);
       fromY += 5;

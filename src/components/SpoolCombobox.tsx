@@ -27,7 +27,7 @@ export function SpoolCombobox({ value, spools, onChange, className }: Props) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  const standardTypes = ['PLA', 'PETG', 'ABS', 'TPU'];
+  const standardTypes = ['PLA', 'PLA+', 'PLA Matte', 'PLA Silk', 'PLA Tough', 'PLA CF', 'PETG', 'PETG Rapid', 'PETG CF', 'PETG Tough', 'PETG Translucent', 'ABS', 'TPU', 'ASA', 'Nylon'];
   
   const filteredStandard = standardTypes.filter(t => t.toLowerCase().includes(search.toLowerCase()));
   const filteredSpools = spools.filter(s => 

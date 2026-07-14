@@ -9,6 +9,7 @@ export function PrinterManagement() {
   const [isOpen, setIsOpen] = useState(false);
 
   const [editingPrinterId, setEditingPrinterId] = useState<string | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'maintenance'>('details');
   const [maintenanceForm, setMaintenanceForm] = useState<Partial<MaintenanceLog>>({ date: new Date().toISOString().split('T')[0], task: '', cost: 0, notes: '' });
   const [formState, setFormState] = useState<Partial<Printer>>({
@@ -24,6 +25,7 @@ export function PrinterManagement() {
       setFormState(printer);
       setEditingPrinterId(printer.id);
       setActiveTab('details');
+      setIsAdding(false);
     } else {
       setFormState({
         name: '',
@@ -34,6 +36,7 @@ export function PrinterManagement() {
       });
       setEditingPrinterId(null);
       setActiveTab('details');
+      setIsAdding(true);
     }
   };
 
@@ -98,6 +101,7 @@ export function PrinterManagement() {
       });
     }
     setEditingPrinterId(null);
+    setIsAdding(false);
   };
 
   const handleDeletePrinter = (id: string, e: React.MouseEvent) => {
@@ -195,14 +199,14 @@ export function PrinterManagement() {
 
                   {/* Form View */}
                   <div className="w-full md:w-1/2 p-6 overflow-y-auto">
-                    {editingPrinterId !== null || printers.length === 0 ? (
+                    {editingPrinterId !== null || isAdding || printers.length === 0 ? (
 
                       <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300 h-full flex flex-col">
                         <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
                           <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">
                             {editingPrinterId ? 'Edit Printer' : 'Add New Printer'}
                           </h3>
-                          {editingPrinterId && (
+                          {(editingPrinterId || isAdding) && (
                             <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
                               <button 
                                 onClick={() => setActiveTab('details')}
@@ -295,7 +299,7 @@ export function PrinterManagement() {
                               </button>
                               {editingPrinterId && (
                                 <button 
-                                  onClick={() => setEditingPrinterId(null)}
+                                  onClick={() => { setEditingPrinterId(null); setIsAdding(false); }}
                                   className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-colors"
                                 >
                                   Cancel

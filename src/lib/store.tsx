@@ -140,7 +140,11 @@ export interface CalculatorState {
   appLogo: string | null;
   invoiceLogo: string | null;
   companyName?: string;
-  companyAddress?: string;
+  companyStreet?: string;
+  companyCity?: string;
+  companyState?: string;
+  companyZip?: string;
+  companyCountry?: string;
   companyEmail?: string;
   companyPhone?: string;
   companyWebsite?: string;
@@ -232,7 +236,11 @@ const defaultState: CalculatorState = {
   appLogo: null,
   invoiceLogo: null,
   companyName: '',
-  companyAddress: '',
+  companyStreet: '',
+  companyCity: '',
+  companyState: '',
+  companyZip: '',
+  companyCountry: '',
   companyEmail: '',
   companyPhone: '',
   companyWebsite: '',
