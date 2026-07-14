@@ -7,6 +7,37 @@ import { AnimatedNumber } from './AnimatedNumber';
 export function Results() {
   const { state, updateState } = useAppContext();
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  React.useEffect(() => {
+    setIsCalculating(true);
+    const timer = setTimeout(() => setIsCalculating(false), 400);
+    return () => clearTimeout(timer);
+  }, [
+    state.parts,
+    state.laborTimeMin,
+    state.postProcessingTasks,
+    state.hardwareCost,
+    state.packagingCost,
+    state.shippingCost,
+    state.extraItems,
+    state.discountValue,
+    state.discountType,
+    state.applyTaxes,
+    state.gstRate,
+    state.qstRate,
+    state.electricityCost,
+    state.printerPower,
+    state.printerCost,
+    state.printerLifespanHours,
+    state.laborRatePerHour,
+    state.failureRate,
+    state.selectedMargin,
+    state.customMargin,
+    state.currency
+  ]);
+
+
 
   const getCurrencySymbol = (code: string | undefined) => {
     switch (code) {
@@ -210,9 +241,14 @@ export function Results() {
     let fromY = 80;
     doc.text(state.companyName || 'mcut', 110, fromY);
     fromY += 5;
-    const hasCompanyAddress = state.companyStreet || state.companyCity || state.companyCountry;
-    if (hasCompanyAddress) {
-      if (state.companyStreet) { doc.text(state.companyStreet, 110, fromY); fromY += 5; }
+
+    if (state.invoicePreferences?.showBusinessAddress !== false) {
+      const hasCompanyAddress = state.companyStreet || state.companyCity || state.companyCountry;
+      if (hasCompanyAddress) {
+
+      if (state.companyStreet) { doc.text(state.companyStreet, 110, fromY); fromY += 5;
+      }
+    }
       if (state.companyCity || state.companyState || state.companyZip) {
         const line2 = [state.companyCity, state.companyState, state.companyZip].filter(Boolean).join(', ');
         doc.text(line2, 110, fromY); fromY += 5;
@@ -257,9 +293,22 @@ export function Results() {
       const partRatio = baseCost > 0 ? (p.pBaseCost * p.part.quantity) / baseCost : 0;
       const partTotalPreTax = subtotalRaw * partRatio;
       const partUnitPrice = p.part.quantity > 0 ? partTotalPreTax / p.part.quantity : 0;
+      
+      let description = (p.part.name || `Part ${idx + 1}`).replace(/[^\x00-\x7F]/g, '');
+      
+      if (state.invoicePreferences?.showMaterialBreakdown !== false) {
+        const mats = p.part.materials.map(m => m.name).join(', ').replace(/[^\x00-\x7F]/g, '');
+        if (mats) {
+          description += `\nMaterial: ${mats}`;
+        }
+      }
+
+      if (state.invoicePreferences?.showPrintTime !== false) {
+        description += `\nPrint time: ${p.part.printTimeHrs}h ${p.part.printTimeMin}m`;
+      }
 
       return [
-        (p.part.name || `Part ${idx + 1}`).replace(/[^\x00-\x7F]/g, ''),
+        description,
         p.part.quantity.toString(),
         `${cSym}${partUnitPrice.toFixed(2)}`,
         `${cSym}${partTotalPreTax.toFixed(2)}`
@@ -350,14 +399,20 @@ export function Results() {
 
     // GST
     if (state.applyTaxes && state.gstRate > 0) {
-      doc.text(`GST (${state.gstRate}%)`, 150, currentTotalsY, { align: 'right' });
+      const label = state.invoicePreferences?.showTaxPercentages !== false 
+        ? `GST (${state.gstRate}%)` 
+        : 'GST';
+      doc.text(label, 150, currentTotalsY, { align: 'right' });
       doc.text(`${cSym}${gstAmount.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
       currentTotalsY += 8;
     }
 
     // QST
     if (state.applyTaxes && state.qstRate > 0) {
-      doc.text(`QST (${state.qstRate}%)`, 150, currentTotalsY, { align: 'right' });
+      const label = state.invoicePreferences?.showTaxPercentages !== false 
+        ? `QST (${state.qstRate}%)` 
+        : 'QST';
+      doc.text(label, 150, currentTotalsY, { align: 'right' });
       doc.text(`${cSym}${qstAmount.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
       currentTotalsY += 8;
     }
@@ -541,11 +596,34 @@ export function Results() {
     { id: 'luxury', name: 'Luxury', margin: 80, color: 'bg-purple-300/30 border border-purple-400/40 backdrop-blur-md', icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg> },
   ];
 
+    React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+E: Export / Save PDF
+      if (e.ctrlKey && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        savePdfLocal();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  });
+
   return (
-    <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/40 dark:border-slate-700/40 p-6 md:p-8">
-      <div className="flex items-center gap-2 mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-800 dark:text-slate-100 drop-shadow-sm"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-        <h2 className="text-lg font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Suggested Pricing</h2>
+    <div className={`bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/40 dark:border-slate-700/40 p-6 md:p-8 transition-all duration-300 ${isCalculating ? 'opacity-70 scale-[0.99]' : 'opacity-100 scale-100'}`}>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-800 dark:text-slate-100 drop-shadow-sm"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          <h2 className="text-lg font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Suggested Pricing</h2>
+        </div>
+        {isCalculating && (
+          <div className="flex items-center gap-2 text-blue-500 text-xs font-bold uppercase tracking-widest animate-pulse">
+            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Calculating...
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">

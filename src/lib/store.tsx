@@ -102,6 +102,13 @@ export interface InventoryExtraItem {
   rebuyLink?: string;
 }
 
+export interface InvoicePreferences {
+  showTaxPercentages: boolean;
+  showBusinessAddress: boolean;
+  showMaterialBreakdown: boolean;
+  showPrintTime: boolean;
+}
+
 export interface CalculatorState {
   editingInvoiceId?: string | null;
   projectName: string;
@@ -155,11 +162,18 @@ export interface CalculatorState {
 
   appTheme: string;
   isDarkMode: boolean;
+  invoicePreferences?: InvoicePreferences;
   animationsEnabled: {
     popups: boolean;
     jobTracker?: boolean;
     numbers: boolean;
     layouts: boolean;
+  },
+  invoicePreferences: {
+    showTaxPercentages: true,
+    showBusinessAddress: true,
+    showMaterialBreakdown: true,
+    showPrintTime: true,
   };
 }
 

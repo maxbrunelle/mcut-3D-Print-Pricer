@@ -10,6 +10,7 @@ export function InvoiceHistory() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [dragHoverCol, setDragHoverCol] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleStatusChange = (id: string, newStatus: 'Quoted' | 'Printing' | 'Post-Processing' | 'Completed', e?: React.ChangeEvent<HTMLSelectElement>) => {
     if (e) e.stopPropagation();
@@ -237,7 +238,19 @@ export function InvoiceHistory() {
                     <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Job Tracker</h2>
                     <span className="text-xs text-slate-500 dark:text-slate-400 ml-4 font-normal tracking-normal hidden md:inline-block">Click the edit button to modify a quote</span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-64">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                      </div>
+                      <input
+                        type="search"
+                        placeholder="Search jobs..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-sm text-slate-800 dark:text-white placeholder-slate-400"
+                      />
+                    </div>
                     <button
                       onClick={exportToCSV}
                       className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-xl transition-colors font-medium text-sm border border-blue-200/50 dark:border-blue-800/50"

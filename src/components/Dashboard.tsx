@@ -3,6 +3,7 @@ import { useAppContext } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
 import { createPortal } from 'react-dom';
 import { AnimatedNumber } from './AnimatedNumber';
+import { ClientManagementContent } from './ClientManagement';
 import {
   AreaChart,
   Area,
@@ -31,6 +32,7 @@ export function Dashboard() {
   };
   const cSym = getCurrencySymbol(state.currency);
   const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'analytics' | 'crm'>('analytics');
   const invoices = state.invoices || [];
 
   const totalRevenue = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
@@ -40,6 +42,95 @@ export function Dashboard() {
   const completedRevenue = invoices
     .filter(inv => inv.status === 'Completed')
     .reduce((sum, inv) => sum + inv.totalAmount, 0);
+
+  let totalProfit = 0;
+  let totalCompletedIncome = 0;
+
+  invoices.filter(inv => inv.status === 'Completed').forEach(inv => {
+    const s = inv.savedState || {};
+    const parts = s.parts || [];
+    
+    let pMaterialCost = 0;
+    let pPrintTimeHours = 0;
+    
+    parts.forEach((part) => {
+      const q = part.quantity || 1;
+      const matCost = (part.materials || []).reduce((sum, m) => sum + ((m.weight || 0) / 1000) * (m.costPerKg || 0), 0);
+      pMaterialCost += matCost * q;
+      pPrintTimeHours += ((part.printTimeHrs || 0) + ((part.printTimeMin || 0) / 60)) * q;
+    });
+
+    const electricityCost = (state.printerPower * pPrintTimeHours / 1000) * state.electricityCost;
+    const machineCost = (state.printerCost / state.printerLifespanHours) * pPrintTimeHours;
+    
+    const postProcessingTime = (s.postProcessingTasks || []).reduce((sum, task) => sum + (task.timeMin || 0), 0);
+    const totalLaborTimeMin = (s.laborTimeMin || 0) + postProcessingTime;
+    const laborCost = (totalLaborTimeMin / 60) * (state.laborRatePerHour || 0);
+    
+    const hardwareCost = s.hardwareCost || 0;
+    const packagingCost = s.packagingCost || 0;
+    
+    const baseCost = pMaterialCost + electricityCost + machineCost + laborCost + hardwareCost + packagingCost;
+    const failureCost = baseCost * (state.failureRate / 100);
+    const totalCost = baseCost + failureCost;
+    
+    const extraItemsTotal = (s.extraItems || []).reduce((sum, item) => sum + ((item.quantity || 0) * (item.price || 0)), 0);
+    const margin = s.selectedMargin || 40;
+    let preTaxTotal = totalCost + (totalCost * (margin / 100)) + (s.shippingCost || 0) + extraItemsTotal;
+    
+    const discountVal = s.discountValue || 0;
+    if (s.discountType === 'percentage') {
+      preTaxTotal = preTaxTotal * (1 - discountVal / 100);
+    } else {
+      preTaxTotal = Math.max(0, preTaxTotal - discountVal);
+    }
+
+    totalCompletedIncome += preTaxTotal;
+    totalProfit += (preTaxTotal - (totalCost + (s.shippingCost || 0))); 
+  });
+
+  const profitMarginPercent = totalCompletedIncome > 0 ? (totalProfit / totalCompletedIncome) * 100 : 0;
+
+
+  // Filament consumption per material type and color (last 6 months)
+  const last6MonthsFilamentMap = new Map();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const monthStr = d.toLocaleString('default', { month: 'short' });
+    last6MonthsFilamentMap.set(monthStr, { month: monthStr });
+  }
+
+  const filamentColors = new Map(); // key: "material color", value: colorHex
+
+  invoices.forEach(inv => {
+    if (inv.status === 'Quoted') return;
+    const invDate = new Date(inv.date);
+    const monthStr = invDate.toLocaleString('default', { month: 'short' });
+    if (last6MonthsFilamentMap.has(monthStr) && inv.spoolDeductions) {
+      const monthData = last6MonthsFilamentMap.get(monthStr);
+      inv.spoolDeductions.forEach(deduction => {
+        const spool = state.spools?.find(s => s.id === deduction.spoolId);
+        const material = spool ? spool.material : 'Unknown';
+        const color = spool ? spool.color : 'Unknown';
+        const hex = spool ? spool.colorHex : '#94a3b8';
+        const key = `${material} - ${color}`;
+        
+        if (key === 'Unknown - Unknown') return; // Skip completely unknown ones if needed, or keep them.
+
+        if (!filamentColors.has(key)) {
+          filamentColors.set(key, hex);
+        }
+        if (!monthData[key]) {
+          monthData[key] = 0;
+        }
+        monthData[key] += deduction.weightUsed / 1000;
+      });
+    }
+  });
+
+  const filamentChartData = Array.from(last6MonthsFilamentMap.values());
+  const filamentKeys = Array.from(filamentColors.keys());
 
   const averageJobValue = totalJobs > 0 ? totalRevenue / totalJobs : 0;
 
@@ -107,24 +198,54 @@ export function Dashboard() {
                 animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
                 exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
                 transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
-                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-6xl max-h-[90vh] flex flex-col"
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-6xl h-[90vh] flex flex-col"
               >
                 <div className="flex justify-between items-center mb-6">
-                  <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                    <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Business Analytics</h2>
+                  <div className="flex bg-slate-100 dark:bg-slate-800/60 p-1.5 rounded-2xl">
+                    <button
+                      onClick={() => setActiveTab('analytics')}
+                      className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 ${activeTab === 'analytics' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                      Analytics
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('crm')}
+                      className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 ${activeTab === 'crm' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                      Clients / CRM
+                    </button>
                   </div>
                   <button 
                     onClick={() => setIsOpen(false)}
-                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
                   </button>
                 </div>
             
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
+            {activeTab === 'analytics' ? (
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
               {/* KPI Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="bg-rose-50/50 border border-rose-100 rounded-2xl p-5 flex flex-col justify-center">
+                  <span className="text-rose-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Net Profit
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <AnimatedNumber 
+                      value={totalProfit} 
+                      format={(v) => `${cSym}${v.toFixed(2)}`} 
+                      className="text-3xl font-black text-slate-800 dark:text-slate-100" 
+                      enabled={state.animationsEnabled?.numbers !== false}
+                    />
+                    <span className="text-sm font-medium text-rose-500 bg-rose-100 px-2 py-0.5 rounded-full">
+                      {profitMarginPercent.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
                 <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 flex flex-col justify-center">
                   <span className="text-blue-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -301,7 +422,44 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
+              
+              {/* Filament Consumption Chart */}
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
+                <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-6 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><path d="m21 16-5.5 5.5A2.83 2.83 0 0 1 11.5 21 2.83 2.83 0 0 1 9.5 20.3L2 12.8a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.4a2 2 0 0 1 1.4.6l7.5 7.5a2 2 0 0 1 .6 1.4c0 .5-.2 1-.6 1.4Z"/><circle cx="7" cy="7" r="1.5"/></svg>
+                  Filament Consumption (Last 6 Months)
+                </h3>
+                <div className="h-64">
+                  {filamentKeys.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={filamentChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} maxBarSize={40}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(val) => `${val}kg`} />
+                        <Tooltip 
+                          contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                          formatter={(value, name) => [`${Number(value).toFixed(2)} kg`, name]}
+                          cursor={{ fill: '#f1f5f9' }}
+                        />
+                        <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                        {filamentKeys.map((key) => (
+                          <Bar key={key} dataKey={key} stackId="a" fill={filamentColors.get(key)} name={key} />
+                        ))}
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-slate-400 text-sm flex flex-col items-center justify-center h-full gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 14.14 14.14"/></svg>
+                      No filament usage data in the last 6 months.
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </div>
+            ) : (
+              <ClientManagementContent />
+            )}
               </motion.div>
             </motion.div>
           )}

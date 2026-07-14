@@ -2,7 +2,6 @@ import { SpoolCombobox } from "./SpoolCombobox";
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppContext, ProjectPart } from '../lib/store';
-import { parse3DFile } from '../lib/three-parser';
 import { CustomerSelect } from './CustomerSelect';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -13,6 +12,7 @@ export function Calculator() {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showManageCustomersModal, setShowManageCustomersModal] = useState(false);
   const [showExtraItemsModal, setShowExtraItemsModal] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
   const [newCustomerName, setNewCustomerName] = useState('');
   const [newCustomerStreet, setNewCustomerStreet] = useState('');
@@ -21,9 +21,26 @@ export function Calculator() {
   const [newCustomerZip, setNewCustomerZip] = useState('');
   const [newCustomerCountry, setNewCustomerCountry] = useState('Canada');
   
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [expandedPartId, setExpandedPartId] = useState<string | null>(state.parts[0]?.id || null);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Shift+C: Clear Form
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        setShowClearConfirm(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  React.useEffect(() => {
+    if (state.editingInvoiceId && state.parts.length > 0) {
+      setExpandedPartId(state.parts[0].id);
+    }
+  }, [state.editingInvoiceId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -69,38 +86,43 @@ export function Calculator() {
     updateState({ parts: newParts });
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      try {
-        const { volumeCm3, weight: parsedWeight, timeHrs } = await parse3DFile(file);
-        
-        let weight = parsedWeight || 0;
-        if (volumeCm3 && !weight) {
-          // PLA density ~ 1.24g/cm3
-          weight = volumeCm3 * 1.24;
-        }
+  const handleClearForm = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setShowClearConfirm(true);
+  };
 
-        const newPartId = Math.random().toString();
-        const newPart: ProjectPart = {
+  const executeClearForm = () => {
+    const newPartId = Math.random().toString();
+    updateState({
+      editingInvoiceId: null,
+      projectName: '',
+      parts: [
+        {
           id: newPartId,
-          name: file.name.replace(/\.(3mf|stl|gcode)$/i, ''),
+          name: '',
           isMultiMaterial: false,
           materials: [
-            { id: Math.random().toString(), name: 'PLA', costPerKg: 25, weight: parseFloat(weight.toFixed(2)) || 0 }
+            { id: Math.random().toString(), name: 'PLA', costPerKg: 25, weight: 0 }
           ],
-          printTimeHrs: timeHrs ? Math.floor(timeHrs) : 0,
-          printTimeMin: timeHrs ? Math.round((timeHrs - Math.floor(timeHrs)) * 60) : 0,
-          quantity: 1
-        };
-        
-        updateState({ parts: [...state.parts, newPart] });
-        setExpandedPartId(newPartId);
-      } catch (err) {
-        console.error("Failed to parse 3D file", err);
-      }
-      e.target.value = '';
-    }
+          printTimeHrs: 0,
+          printTimeMin: 0,
+          quantity: 1,
+        }
+      ],
+      selectedCustomerId: null,
+      extraItems: [],
+      postProcessingTasks: [],
+      laborTimeMin: 0,
+      hardwareCost: 0,
+      packagingCost: 0,
+      shippingCost: 0,
+      discountType: 'percentage',
+      discountValue: 0,
+      applyTaxes: true,
+      selectedMargin: state.customMargin || 40
+    });
+    setExpandedPartId(newPartId);
+    setShowClearConfirm(false);
   };
 
   const addPart = () => {
@@ -218,13 +240,12 @@ export function Calculator() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">Print Calculator</h2>
         <button 
-          onClick={() => fileInputRef.current?.click()}
-          className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:hover:bg-slate-700/50 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300 text-slate-800 dark:text-white"
+          onClick={handleClearForm}
+          className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 hover:text-red-600 dark:hover:text-red-400 px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-          Auto-fill from 3D File
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Clear Form
         </button>
-        <input type="file" accept=".3mf,.stl,.gcode" ref={fileInputRef} onChange={handleFileUpload} className="hidden text-slate-800 dark:text-white" />
       </div>
 
       <div className="space-y-6">
@@ -240,13 +261,7 @@ export function Calculator() {
             <div className="flex justify-between items-center mb-2">
               <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Customer</label>
               <div className="flex gap-4">
-                <button 
-                  onClick={() => setShowManageCustomersModal(true)}
-                  className="text-xs text-slate-600 dark:text-slate-300 font-medium hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 flex items-center gap-1 transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-                  Manage
-                </button>
+                
                 <button 
                   onClick={() => setShowCustomerModal(true)}
                   className="text-xs text-blue-600 font-medium hover:text-blue-800 flex items-center gap-1 transition-colors"
@@ -1148,6 +1163,45 @@ export function Calculator() {
           </motion.div>
         </motion.div>
         )}
+        </AnimatePresence>,
+        document.body
+      )}
+      {createPortal(
+        <AnimatePresence>
+          {showClearConfirm && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+            >
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 p-6 max-w-md w-full"
+              >
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Clear Form</h3>
+                <p className="text-slate-600 dark:text-slate-300 mb-6">
+                  Are you sure you want to clear the form? All unsaved changes will be lost.
+                </p>
+                <div className="flex gap-4 justify-end">
+                  <button
+                    onClick={() => setShowClearConfirm(false)}
+                    className="px-6 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={executeClearForm}
+                    className="px-6 py-3 rounded-xl font-bold bg-red-500 hover:bg-red-600 text-white transition-colors"
+                  >
+                    Clear Form
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>,
         document.body
       )}

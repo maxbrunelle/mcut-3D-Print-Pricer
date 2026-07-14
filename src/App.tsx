@@ -6,6 +6,7 @@ import { InvoiceHistory } from './components/InvoiceHistory';
 import { SpoolInventory } from './components/SpoolInventory';
 import { ExtraItemInventory } from './components/ExtraItemInventory';
 import { Dashboard } from './components/Dashboard';
+
 import { PrinterManagement } from './components/PrinterManagement';
 import { InstallPWA } from './components/InstallPWA';
 import { Header } from './components/Header';
@@ -56,7 +57,7 @@ function AppContent() {
   }, [state.isDarkMode]);
 
   return (
-    <div className={`min-h-screen p-4 md:p-8 font-sans bg-gradient-to-br ${theme.bg} relative overflow-hidden transition-colors duration-1000`}>
+    <div className={`min-h-screen p-4 md:p-8 font-sans bg-gradient-to-br ${theme.bg} relative overflow-clip transition-colors duration-1000`}>
       {/* Animated ambient background blobs */}
       <div className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full ${theme.blob1} blur-3xl mix-blend-multiply dark:mix-blend-screen transition-colors duration-1000`}></div>
       <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full ${theme.blob2} blur-3xl mix-blend-multiply dark:mix-blend-screen transition-colors duration-1000`}></div>
@@ -66,6 +67,7 @@ function AppContent() {
         <Header />
 
         <div className="mb-8 flex flex-wrap gap-4">
+          
           <InvoiceHistory />
           <SpoolInventory /><ExtraItemInventory />
           <PrinterManagement />
@@ -77,7 +79,7 @@ function AppContent() {
             <Calculator />
           </div>
 
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5 lg:sticky lg:top-8 self-start">
             <Results />
           </div>
         </div>
