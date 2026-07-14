@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useAppContext, ProjectPart } from '../lib/store';
 import { parse3DFile } from '../lib/three-parser';
 import { CustomerSelect } from './CustomerSelect';
+import { motion, AnimatePresence } from 'motion/react';
 
 export function Calculator() {
   const { state, updateState } = useAppContext();
@@ -261,21 +262,6 @@ export function Calculator() {
               onChange={(id) => updateState({ selectedCustomerId: id || null })}
             />
           </div>
-          
-          {/* PRINTER PROFILE */}
-          <div className="md:col-span-2">
-            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Printer Profile</label>
-            <select name="printerProfile" value={state.printerProfile} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 appearance-none cursor-pointer text-slate-800 dark:text-white">
-              <option>Generic Printer</option>
-              <option>Prusa i3 MK3S+</option>
-              <option>Bambu Lab X1C</option>
-              <option>Bambu Lab P1S</option>
-              <option>Bambu Lab P1P</option>
-              <option>Bambu Lab A1</option>
-              <option>Bambu Lab A1 Mini</option>
-              <option>Creality Ender 3</option>
-            </select>
-          </div>
         </div>
 
         {/* PROJECT PARTS */}
@@ -292,8 +278,16 @@ export function Calculator() {
           </div>
 
           <div className="space-y-4">
+            <AnimatePresence>
             {state.parts.map((part, partIndex) => (
-              <div key={part.id} className="border border-white/60 dark:border-slate-700/60 bg-white/30 dark:bg-slate-800/40 rounded-2xl overflow-hidden shadow-sm transition-all">
+              <motion.div 
+                key={part.id} 
+                layout={state.animationsEnabled?.layouts !== false}
+                initial={state.animationsEnabled?.layouts !== false ? { opacity: 0, y: 10 } : false}
+                animate={state.animationsEnabled?.layouts !== false ? { opacity: 1, y: 0 } : false}
+                exit={state.animationsEnabled?.layouts !== false ? { opacity: 0, scale: 0.95 } : false}
+                className="border border-white/60 dark:border-slate-700/60 bg-white/30 dark:bg-slate-800/40 rounded-2xl overflow-hidden shadow-sm transition-all"
+              >
                 <div 
                   className={`p-4 flex items-center justify-between cursor-pointer hover:bg-white/50 dark:bg-slate-800/50 transition-colors ${expandedPartId === part.id ? 'bg-white/50 dark:bg-slate-800/50' : ''}`}
                   onClick={() => setExpandedPartId(expandedPartId === part.id ? null : part.id)}
@@ -377,8 +371,16 @@ export function Calculator() {
                       </div>
 
                       <div className="space-y-3">
+                        <AnimatePresence>
                         {part.materials.map(mat => (
-                          <div key={mat.id} className="p-3 bg-white/40 dark:bg-slate-800/40 border border-white/50 dark:border-slate-700/50 rounded-xl relative">
+                          <motion.div 
+                            key={mat.id} 
+                            layout={state.animationsEnabled?.layouts !== false}
+                            initial={state.animationsEnabled?.layouts !== false ? { opacity: 0, scale: 0.95 } : false}
+                            animate={state.animationsEnabled?.layouts !== false ? { opacity: 1, scale: 1 } : false}
+                            exit={state.animationsEnabled?.layouts !== false ? { opacity: 0, scale: 0.95 } : false}
+                            className="p-3 bg-white/40 dark:bg-slate-800/40 border border-white/50 dark:border-slate-700/50 rounded-xl relative"
+                          >
                             {part.isMultiMaterial && part.materials.length > 1 && (
                               <button 
                                 onClick={() => removeMaterialFromPart(part.id, mat.id)}
@@ -436,8 +438,9 @@ export function Calculator() {
                                 </div>
                               </div>
                             </div>
-                          </div>
+                          </motion.div>
                         ))}
+                        </AnimatePresence>
                       </div>
                     </div>
 
@@ -465,10 +468,26 @@ export function Calculator() {
                         </div>
                       </div>
                     </div>
+
+                    <div className="mt-4">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Printer</label>
+                      <select 
+                        value={part.printerId || ''} 
+                        onChange={(e) => handlePartChange(part.id, 'printerId', e.target.value)}
+                        className="w-full px-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all text-sm text-slate-800 dark:text-white"
+                      >
+                        <option value="">Default Settings</option>
+                        {state.printers && state.printers.map(printer => (
+                          <option key={printer.id} value={printer.id}>{printer.name} ({printer.model})</option>
+                        ))}
+                      </select>
+                    </div>
+
                   </div>
                 )}
-              </div>
+              </motion.div>
             ))}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -492,8 +511,16 @@ export function Calculator() {
 
           <div className="space-y-3">
             {state.postProcessingTasks?.length > 0 ? (
-              state.postProcessingTasks.map((task) => (
-                <div key={task.id} className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60">
+              <AnimatePresence>
+              {state.postProcessingTasks.map((task) => (
+                <motion.div 
+                  key={task.id} 
+                  layout={state.animationsEnabled?.layouts !== false}
+                  initial={state.animationsEnabled?.layouts !== false ? { opacity: 0, x: -10 } : false}
+                  animate={state.animationsEnabled?.layouts !== false ? { opacity: 1, x: 0 } : false}
+                  exit={state.animationsEnabled?.layouts !== false ? { opacity: 0, scale: 0.95 } : false}
+                  className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60"
+                >
                   <div className="flex-1">
                     <input 
                       type="text" 
@@ -518,8 +545,9 @@ export function Calculator() {
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                   </button>
-                </div>
-              ))
+                </motion.div>
+              ))}
+              </AnimatePresence>
             ) : (
               <div className="text-center py-6 bg-white/30 dark:bg-slate-800/40 rounded-2xl border border-white/40 dark:border-slate-700/40 border-dashed">
                 <p className="text-sm text-slate-500 dark:text-slate-400">No post-processing tasks added.</p>
@@ -559,8 +587,16 @@ export function Calculator() {
 
           <div className="space-y-3">
             {state.extraItems?.length > 0 ? (
-              state.extraItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60">
+              <AnimatePresence>
+              {state.extraItems.map((item) => (
+                <motion.div 
+                  key={item.id} 
+                  layout={state.animationsEnabled?.layouts !== false}
+                  initial={state.animationsEnabled?.layouts !== false ? { opacity: 0, x: -10 } : false}
+                  animate={state.animationsEnabled?.layouts !== false ? { opacity: 1, x: 0 } : false}
+                  exit={state.animationsEnabled?.layouts !== false ? { opacity: 0, scale: 0.95 } : false}
+                  className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60"
+                >
                   <div className="flex-1">
                     <input 
                       type="text" 
@@ -594,8 +630,9 @@ export function Calculator() {
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                   </button>
-                </div>
-              ))
+                </motion.div>
+              ))}
+              </AnimatePresence>
             ) : (
               <div className="text-center py-6 bg-white/30 dark:bg-slate-800/40 rounded-2xl border border-white/40 dark:border-slate-700/40 border-dashed">
                 <p className="text-sm text-slate-500 dark:text-slate-400">No extra items added.</p>
@@ -761,7 +798,7 @@ export function Calculator() {
                   <input type="number" name="failureRate" value={state.failureRate} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Printer Cost ($)</label>
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Default Printer Cost ($)</label>
                   <input type="number" name="printerCost" value={state.printerCost} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm transition-all duration-300 text-slate-800 dark:text-white" />
                 </div>
                 <div>
@@ -778,29 +815,42 @@ export function Calculator() {
         </div>
       </div>
 
-      {showCustomerModal && createPortal(
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-md flex flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">
-                  {editingCustomerId ? 'Edit Customer' : 'Add New Customer'}
-                </h3>
-                {!editingCustomerId && (
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
-                    #{state.nextClientNumber.toString().padStart(6, '0')}
-                  </div>
-                )}
-              </div>
-              <button 
-                onClick={() => {
-                  setShowCustomerModal(false);
-                  setEditingCustomerId(null);
-                }}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+      {createPortal(
+        <AnimatePresence>
+          {showCustomerModal && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-md flex flex-col"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-              </button>
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">
+                      {editingCustomerId ? 'Edit Customer' : 'Add New Customer'}
+                    </h3>
+                    {!editingCustomerId && (
+                      <div className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                        #{state.nextClientNumber.toString().padStart(6, '0')}
+                      </div>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setShowCustomerModal(false);
+                      setEditingCustomerId(null);
+                    }}
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                  </button>
             </div>
             
             <div className="space-y-4">
@@ -938,22 +988,37 @@ export function Calculator() {
                 {editingCustomerId ? 'Save Changes' : 'Add Customer'}
               </button>
             </div>
-          </div>
-        </div>,
+          </motion.div>
+        </motion.div>
+        )}
+        </AnimatePresence>,
         document.body
       )}
 
-      {showManageCustomersModal && createPortal(
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-2xl flex flex-col max-h-[80vh]">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">Manage Customers</h3>
-              <button 
-                onClick={() => setShowManageCustomersModal(false)}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+      {createPortal(
+        <AnimatePresence>
+          {showManageCustomersModal && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-2xl flex flex-col max-h-[80vh]"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              </button>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">Manage Customers</h3>
+                  <button 
+                    onClick={() => setShowManageCustomersModal(false)}
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
             </div>
             <div className="overflow-y-auto flex-1 pr-2 space-y-3">
               {state.customers.length === 0 ? (
@@ -1015,25 +1080,40 @@ export function Calculator() {
                 Close
               </button>
             </div>
-          </div>
-        </div>,
+          </motion.div>
+        </motion.div>
+        )}
+        </AnimatePresence>,
         document.body
       )}
       {/* Extra Items Modal */}
-      {showExtraItemsModal && createPortal(
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-2xl flex flex-col max-h-[80vh]">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
-                Select Extra Item
-              </h3>
-              <button 
-                onClick={() => setShowExtraItemsModal(false)}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+      {createPortal(
+        <AnimatePresence>
+          {showExtraItemsModal && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-2xl flex flex-col max-h-[80vh]"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-              </button>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                    Select Extra Item
+                  </h3>
+                  <button 
+                    onClick={() => setShowExtraItemsModal(false)}
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
             </div>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1065,8 +1145,10 @@ export function Calculator() {
                 Close
               </button>
             </div>
-          </div>
-        </div>,
+          </motion.div>
+        </motion.div>
+        )}
+        </AnimatePresence>,
         document.body
       )}
     </div>

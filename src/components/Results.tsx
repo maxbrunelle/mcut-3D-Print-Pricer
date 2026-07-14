@@ -2,10 +2,21 @@ import React, { useState } from 'react';
 import { useAppContext } from '../lib/store';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { AnimatedNumber } from './AnimatedNumber';
 
 export function Results() {
   const { state, updateState } = useAppContext();
   const [isSyncing, setIsSyncing] = useState(false);
+
+  const getCurrencySymbol = (code: string | undefined) => {
+    switch (code) {
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'JPY': return '¥';
+      default: return '$';
+    }
+  };
+  const cSym = getCurrencySymbol(state.currency);
 
   // Calculations
   const partCalculations = state.parts.map(part => {
@@ -13,9 +24,16 @@ export function Results() {
     const pTotalWeight = part.materials.reduce((sum, m) => sum + m.weight, 0);
     const pPrintTimeHours = part.printTimeHrs + (part.printTimeMin / 60);
     
+
+    const printer = part.printerId ? (state.printers || []).find(p => p.id === part.printerId) : null;
+    const power = printer ? printer.powerWatts : state.printerPower;
+    const pCost = printer ? printer.cost : state.printerCost;
+    const pLife = printer ? printer.lifespanHours : state.printerLifespanHours;
+
     // Costs per single unit of this part
-    const pElectricityCost = (state.printerPower * pPrintTimeHours / 1000) * state.electricityCost;
-    const pMachineCost = (state.printerCost / state.printerLifespanHours) * pPrintTimeHours;
+    const pElectricityCost = (power * pPrintTimeHours / 1000) * state.electricityCost;
+    const pMachineCost = (pCost / pLife) * pPrintTimeHours;
+
     
     const pBaseCost = pMaterialCost + pElectricityCost + pMachineCost;
     
@@ -92,6 +110,15 @@ export function Results() {
     const invoiceNumber = state.nextInvoiceNumber.toString().padStart(6, '0');
 
     // Header - Logo and No.
+    doc.setFontSize(36);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...primaryColor);
+    doc.text('INVOICE', 14, 20);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`NO. ${invoiceNumber}`, 14, 28);
+
     if (state.invoiceLogo) {
       try {
         const img = new Image();
@@ -109,37 +136,27 @@ export function Results() {
             finalWidth = 60;
             finalHeight = 60 / aspect;
           }
-          doc.addImage(state.invoiceLogo, 14, 10, finalWidth, finalHeight, undefined, 'FAST');
+          doc.addImage(state.invoiceLogo, 196 - finalWidth, 10, finalWidth, finalHeight, undefined, 'FAST');
         } else {
-          doc.addImage(state.invoiceLogo, 14, 10, 40, 20, undefined, 'FAST');
+          doc.addImage(state.invoiceLogo, 156, 10, 40, 20, undefined, 'FAST');
         }
       } catch (e) {
         console.warn('Failed to add custom invoice logo', e);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(28);
         doc.setTextColor(75, 82, 158);
-        doc.text('mcut', 14, 20);
+        doc.text(state.companyName || 'mcut', 166, 20);
         doc.setFillColor(184, 212, 123);
-        doc.circle(41, 16, 3, 'F');
+        doc.circle(193, 16, 3, 'F');
       }
     } else {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(28);
       doc.setTextColor(75, 82, 158);
-      doc.text('mcut', 14, 20);
+      doc.text(state.companyName || 'mcut', 166, 20);
       doc.setFillColor(184, 212, 123);
-      doc.circle(41, 16, 3, 'F');
+      doc.circle(193, 16, 3, 'F');
     }
-    
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(...primaryColor);
-    doc.text(`NO. ${invoiceNumber}`, 196, 20, { align: 'right' });
-
-    // INVOICE Title
-    doc.setFontSize(36);
-    doc.setFont('helvetica', 'bold');
-    doc.text('INVOICE', 14, 45);
 
     // Date
     doc.setFontSize(10);
@@ -190,13 +207,32 @@ export function Results() {
 
     // From Address
     let fromY = 80;
-    doc.text('mcut', 110, fromY);
+    doc.text(state.companyName || 'mcut', 110, fromY);
     fromY += 5;
-    doc.text('292 rue Melrose', 110, fromY);
-    fromY += 5;
-    doc.text('Verdun, Qc H4H 1T3', 110, fromY);
-    fromY += 5;
-    doc.text('Canada', 110, fromY);
+    if (state.companyAddress) {
+      const addrLines = doc.splitTextToSize(state.companyAddress, 80);
+      doc.text(addrLines, 110, fromY);
+      fromY += (addrLines.length * 5);
+    } else {
+      doc.text('292 rue Melrose', 110, fromY);
+      fromY += 5;
+      doc.text('Verdun, Qc H4H 1T3', 110, fromY);
+      fromY += 5;
+      doc.text('Canada', 110, fromY);
+    }
+    
+    if (state.companyEmail) {
+      doc.text(state.companyEmail, 110, fromY);
+      fromY += 5;
+    }
+    if (state.companyPhone) {
+      doc.text(state.companyPhone, 110, fromY);
+      fromY += 5;
+    }
+    if (state.companyWebsite) {
+      doc.text(state.companyWebsite, 110, fromY);
+      fromY += 5;
+    }
 
     // Table
     const safeProjectName = (state.projectName || 'New Project').replace(/[^\x00-\x7F]/g, '');
@@ -220,8 +256,8 @@ export function Results() {
       return [
         (p.part.name || `Part ${idx + 1}`).replace(/[^\x00-\x7F]/g, ''),
         p.part.quantity.toString(),
-        `$${partUnitPrice.toFixed(2)}`,
-        `$${partTotalPreTax.toFixed(2)}`
+        `${cSym}${partUnitPrice.toFixed(2)}`,
+        `${cSym}${partTotalPreTax.toFixed(2)}`
       ];
     });
 
@@ -247,8 +283,8 @@ export function Results() {
           tableBody.push([
             `Extra: ${item.name}`.replace(/[^\x00-\x7F]/g, ''),
             qty.toString(),
-            `$${price.toFixed(2)}`,
-            `$${amount.toFixed(2)}`
+            `${cSym}${price.toFixed(2)}`,
+            `${cSym}${amount.toFixed(2)}`
           ]);
         }
       });
@@ -287,13 +323,13 @@ export function Results() {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...secondaryColor);
     doc.text('Subtotal', 150, currentTotalsY, { align: 'right' });
-    doc.text(`$${tableSubtotal.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
+    doc.text(`${cSym}${tableSubtotal.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
     currentTotalsY += 8;
 
     // Shipping
     if (state.shippingCost > 0) {
       doc.text('Shipping', 150, currentTotalsY, { align: 'right' });
-      doc.text(`$${state.shippingCost.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
+      doc.text(`${cSym}${state.shippingCost.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
       currentTotalsY += 8;
     }
 
@@ -302,7 +338,7 @@ export function Results() {
       doc.text('Discount', 150, currentTotalsY, { align: 'right' });
       const discountDisplay = state.discountType === 'percentage' 
         ? `-${discountVal}%`
-        : `-$${discountVal.toFixed(2)}`;
+        : `-${cSym}${discountVal.toFixed(2)}`;
       doc.text(discountDisplay, 196, currentTotalsY, { align: 'right' });
       currentTotalsY += 8;
     }
@@ -310,14 +346,14 @@ export function Results() {
     // GST
     if (state.applyTaxes && state.gstRate > 0) {
       doc.text(`GST (${state.gstRate}%)`, 150, currentTotalsY, { align: 'right' });
-      doc.text(`$${gstAmount.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
+      doc.text(`${cSym}${gstAmount.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
       currentTotalsY += 8;
     }
 
     // QST
     if (state.applyTaxes && state.qstRate > 0) {
       doc.text(`QST (${state.qstRate}%)`, 150, currentTotalsY, { align: 'right' });
-      doc.text(`$${qstAmount.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
+      doc.text(`${cSym}${qstAmount.toFixed(2)}`, 196, currentTotalsY, { align: 'right' });
       currentTotalsY += 8;
     }
 
@@ -325,7 +361,7 @@ export function Results() {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...primaryColor);
     doc.text('Total', 150, currentTotalsY + 2, { align: 'right' });
-    doc.text(`$${finalBatchTotal.toFixed(2)}`, 196, currentTotalsY + 2, { align: 'right' });
+    doc.text(`${cSym}${finalBatchTotal.toFixed(2)}`, 196, currentTotalsY + 2, { align: 'right' });
     
     // Line under total
     doc.setDrawColor(230, 230, 230);
@@ -475,14 +511,17 @@ export function Results() {
                   {tier.icon}
                   <span className="font-medium text-lg">{tier.name}</span>
                 </div>
-                <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-                  ${finalTotal.toFixed(2)}
-                </div>
+                <AnimatedNumber 
+                  value={finalTotal} 
+                  format={(v) => `${cSym}${v.toFixed(2)}`} 
+                  className="text-2xl font-bold text-slate-900 dark:text-slate-50"
+                  enabled={state.animationsEnabled?.numbers !== false}
+                />
               </div>
               <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-300">
                 <span>+{tier.margin}% profit margin</span>
                 {state.applyTaxes ? (
-                  <span>${calculatePreTax(tier.margin).toFixed(2)} pre-tax</span>
+                  <span>{cSym}{calculatePreTax(tier.margin).toFixed(2)} pre-tax</span>
                 ) : (
                   <span>No taxes applied</span>
                 )}
@@ -501,9 +540,12 @@ export function Results() {
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
               <span className="font-medium text-lg">Custom</span>
             </div>
-            <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-              ${calculateTotal(state.customMargin).toFixed(2)}
-            </div>
+            <AnimatedNumber 
+              value={calculateTotal(state.customMargin)} 
+              format={(v) => `${cSym}${v.toFixed(2)}`} 
+              className="text-2xl font-bold text-slate-900 dark:text-slate-50"
+              enabled={state.animationsEnabled?.numbers !== false}
+            />
           </div>
           
           <div className="flex items-center gap-4 mb-4" onClick={(e) => e.stopPropagation()}>
@@ -529,7 +571,7 @@ export function Results() {
           <div className="flex justify-between items-center text-sm text-slate-600 dark:text-slate-300">
             <span>+{state.customMargin}% profit margin</span>
             {state.applyTaxes ? (
-              <span>${calculatePreTax(state.customMargin).toFixed(2)} pre-tax</span>
+              <span>{cSym}{calculatePreTax(state.customMargin).toFixed(2)} pre-tax</span>
             ) : (
               <span>No taxes applied</span>
             )}
@@ -539,7 +581,15 @@ export function Results() {
 
       <div className="mt-8 pt-6 border-t border-white/40 dark:border-slate-700/40 flex flex-col items-stretch gap-4">
         <div className="flex justify-between items-center text-sm text-slate-700 dark:text-slate-200 px-2 drop-shadow-sm">
-          <span>Total Project: <span className="font-bold text-slate-900 dark:text-slate-50">${unitTotal.toFixed(2)} {state.applyTaxes ? 'incl. taxes' : 'pre-tax'}</span></span>
+          <span className="flex items-center gap-1">Total Project: 
+            <AnimatedNumber 
+              value={unitTotal} 
+              format={(v) => `${cSym}${v.toFixed(2)}`} 
+              className="font-bold text-slate-900 dark:text-slate-50"
+              enabled={state.animationsEnabled?.numbers !== false}
+            />
+            <span className="font-bold text-slate-900 dark:text-slate-50">{state.applyTaxes ? 'incl. taxes' : 'pre-tax'}</span>
+          </span>
           <span>{activeMargin}% profit margin</span>
         </div>
         

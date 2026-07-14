@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../lib/store';
+import { motion, AnimatePresence } from 'motion/react';
+import { createPortal } from 'react-dom';
 
 export function InvoiceHistory() {
   const { state, updateState } = useAppContext();
@@ -116,6 +118,42 @@ export function InvoiceHistory() {
 
   const columns: ('Quoted' | 'Printing' | 'Post-Processing' | 'Completed')[] = ['Quoted', 'Printing', 'Post-Processing', 'Completed'];
 
+  const exportToCSV = () => {
+    if (!invoices || invoices.length === 0) return;
+    
+    const headers = [
+      'Invoice Number',
+      'Date',
+      'Customer',
+      'Project',
+      'Status',
+      'Total Amount'
+    ];
+    
+    const rows = invoices.map(inv => [
+      inv.invoiceNumber || '',
+      new Date(inv.date).toLocaleDateString(),
+      inv.customerName || '',
+      inv.partName || '',
+      inv.status || 'Quoted',
+      inv.totalAmount.toFixed(2)
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `sales_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <>
       <button 
@@ -126,21 +164,43 @@ export function InvoiceHistory() {
         Job Tracker ({invoices.length})
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-[1400px] h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
-                <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Job Tracker</h2>
-              </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-[1400px] h-[90vh] flex flex-col"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-              </button>
-            </div>
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
+                    <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Job Tracker</h2>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={exportToCSV}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-xl transition-colors font-medium text-sm border border-blue-200/50 dark:border-blue-800/50"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>
+                      Export CSV
+                    </button>
+                    <button 
+                      onClick={() => setIsOpen(false)}
+                      className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                    </button>
+                  </div>
+                </div>
 
             {invoices.length === 0 ? (
               <div className="text-center py-12 text-slate-500 dark:text-slate-400 flex-1 flex flex-col items-center justify-center bg-white/30 dark:bg-slate-800/40 dark:bg-slate-800/40 backdrop-blur-md rounded-2xl border border-white/40 dark:border-slate-700/60 border-dashed">
@@ -234,8 +294,11 @@ export function InvoiceHistory() {
                 })}
               </div>
             )}
-          </div>
-        </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </>
   );

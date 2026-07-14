@@ -48,6 +48,26 @@ export interface Invoice {
   spoolDeductions?: SpoolDeduction[];
 }
 
+
+
+export interface MaintenanceLog {
+  id: string;
+  date: string;
+  task: string;
+  cost: number;
+  notes: string;
+}
+
+export interface Printer {
+  id: string;
+  name: string;
+  model: string;
+  powerWatts: number;
+  cost: number;
+  lifespanHours: number;
+  maintenanceLogs?: MaintenanceLog[];
+}
+
 export interface ProjectPart {
   id: string;
   name: string;
@@ -56,6 +76,7 @@ export interface ProjectPart {
   printTimeHrs: number;
   printTimeMin: number;
   quantity: number;
+  printerId?: string;
 }
 
 export interface PostProcessingTask {
@@ -83,13 +104,13 @@ export interface InventoryExtraItem {
 export interface CalculatorState {
   projectName: string;
   parts: ProjectPart[];
-  printerProfile: string;
   selectedCustomerId: string | null;
   customers: Customer[];
   nextClientNumber: number;
   nextInvoiceNumber: number;
   invoices: Invoice[];
   spools: Spool[];
+  printers: Printer[];
   postProcessingTasks: PostProcessingTask[];
   extraItems: ExtraItem[];
   inventoryExtraItems: InventoryExtraItem[];
@@ -118,8 +139,21 @@ export interface CalculatorState {
 
   appLogo: string | null;
   invoiceLogo: string | null;
+  companyName?: string;
+  companyAddress?: string;
+  companyEmail?: string;
+  companyPhone?: string;
+  companyWebsite?: string;
+  currency?: string;
+  dateFormat?: string;
+
   appTheme: string;
   isDarkMode: boolean;
+  animationsEnabled: {
+    popups: boolean;
+    numbers: boolean;
+    layouts: boolean;
+  };
 }
 
 interface AppState {
@@ -142,12 +176,14 @@ const defaultState: CalculatorState = {
       quantity: 1,
     }
   ],
-  printerProfile: 'Generic Printer',
   selectedCustomerId: null,
   customers: [],
   nextClientNumber: 1,
   nextInvoiceNumber: 1,
   invoices: [],
+  printers: [
+    { id: '1', name: 'Prusa MK3S+', model: 'MK3S+', powerWatts: 250, cost: 800, lifespanHours: 10000 }
+  ],
   spools: [
     {
       id: '1',
@@ -195,8 +231,21 @@ const defaultState: CalculatorState = {
   selectedMargin: 40,
   appLogo: null,
   invoiceLogo: null,
+  companyName: '',
+  companyAddress: '',
+  companyEmail: '',
+  companyPhone: '',
+  companyWebsite: '',
+  currency: 'USD',
+  dateFormat: 'MM/DD/YYYY',
+
   appTheme: 'indigo-cyan',
   isDarkMode: false,
+  animationsEnabled: {
+    popups: true,
+    numbers: true,
+    layouts: true,
+  },
 };
 
 const STORAGE_KEY = '3d-pricer-state';

@@ -6,6 +6,7 @@ import { InvoiceHistory } from './components/InvoiceHistory';
 import { SpoolInventory } from './components/SpoolInventory';
 import { ExtraItemInventory } from './components/ExtraItemInventory';
 import { Dashboard } from './components/Dashboard';
+import { PrinterManagement } from './components/PrinterManagement';
 import { InstallPWA } from './components/InstallPWA';
 import { Header } from './components/Header';
 
@@ -67,6 +68,7 @@ function AppContent() {
         <div className="mb-8 flex flex-wrap gap-4">
           <InvoiceHistory />
           <SpoolInventory /><ExtraItemInventory />
+          <PrinterManagement />
           <Dashboard />
         </div>
 

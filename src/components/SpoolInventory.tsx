@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAppContext, Spool } from '../lib/store';
+import { motion, AnimatePresence } from 'motion/react';
 
 export function SpoolInventory() {
   const { state, updateState } = useAppContext();
@@ -82,20 +84,33 @@ export function SpoolInventory() {
         Manage Spool Inventory ({spools.length})
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-5xl max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-                <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Spool Inventory</h2>
-              </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-5xl max-h-[90vh] flex flex-col"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-              </button>
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Spool Inventory</h2>
+                  </div>
+                  <button 
+                    onClick={() => setIsOpen(false)}
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                  </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 overflow-y-auto min-h-0 custom-scrollbar pr-2">
@@ -262,8 +277,11 @@ export function SpoolInventory() {
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
+        )}
+        </AnimatePresence>,
+        document.body
       )}
     </>
   );

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../lib/store';
+import { motion, AnimatePresence } from 'motion/react';
+import { createPortal } from 'react-dom';
+import { AnimatedNumber } from './AnimatedNumber';
 import {
   AreaChart,
   Area,
@@ -17,9 +20,17 @@ import {
 } from 'recharts';
 
 export function Dashboard() {
-  const { state } = useAppContext();
+  const { state, updateState } = useAppContext();
+  const getCurrencySymbol = (code: string | undefined) => {
+    switch (code) {
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'JPY': return '¥';
+      default: return '$';
+    }
+  };
+  const cSym = getCurrencySymbol(state.currency);
   const [isOpen, setIsOpen] = useState(false);
-
   const invoices = state.invoices || [];
 
   const totalRevenue = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
@@ -69,6 +80,9 @@ export function Dashboard() {
     { name: 'Completed', value: statusCounts['Completed'] || 0, color: '#22c55e' }
   ].filter(item => item.value > 0);
 
+  const lowSpools = (state.spools || []).filter(s => s.remainingWeight < 200);
+  const lowItems = (state.inventoryExtraItems || []).filter(i => i.quantity < 5);
+
   return (
     <>
       <button 
@@ -79,21 +93,34 @@ export function Dashboard() {
         Analytics Dashboard
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 animate-in zoom-in-95 duration-300 w-full max-w-6xl max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Business Analytics</h2>
-              </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-6xl max-h-[90vh] flex flex-col"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-              </button>
-            </div>
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Business Analytics</h2>
+                  </div>
+                  <button 
+                    onClick={() => setIsOpen(false)}
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                  </button>
+                </div>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
               {/* KPI Cards */}
@@ -103,28 +130,48 @@ export function Dashboard() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     Total Quoted
                   </span>
-                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">${totalRevenue.toFixed(2)}</span>
+                  <AnimatedNumber 
+                    value={totalRevenue} 
+                    format={(v) => `${cSym}${v.toFixed(2)}`} 
+                    className="text-3xl font-black text-slate-800 dark:text-slate-100" 
+                    enabled={state.animationsEnabled?.numbers !== false}
+                  />
                 </div>
                 <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-5 flex flex-col justify-center">
                   <span className="text-emerald-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
                     Completed Revenue
                   </span>
-                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">${completedRevenue.toFixed(2)}</span>
+                  <AnimatedNumber 
+                    value={completedRevenue} 
+                    format={(v) => `${cSym}${v.toFixed(2)}`} 
+                    className="text-3xl font-black text-slate-800 dark:text-slate-100"
+                    enabled={state.animationsEnabled?.numbers !== false}
+                  />
                 </div>
                 <div className="bg-purple-50/50 border border-purple-100 rounded-2xl p-5 flex flex-col justify-center">
                   <span className="text-purple-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                     Total Jobs
                   </span>
-                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">{totalJobs}</span>
+                  <AnimatedNumber 
+                    value={totalJobs} 
+                    format={(v) => Math.round(v).toString()} 
+                    className="text-3xl font-black text-slate-800 dark:text-slate-100"
+                    enabled={state.animationsEnabled?.numbers !== false}
+                  />
                 </div>
                 <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-5 flex flex-col justify-center">
                   <span className="text-amber-500 text-sm font-bold uppercase tracking-wider mb-1 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
                     Avg. Job Value
                   </span>
-                  <span className="text-3xl font-black text-slate-800 dark:text-slate-100">${averageJobValue.toFixed(2)}</span>
+                  <AnimatedNumber 
+                    value={averageJobValue} 
+                    format={(v) => `${cSym}${v.toFixed(2)}`} 
+                    className="text-3xl font-black text-slate-800 dark:text-slate-100"
+                    enabled={state.animationsEnabled?.numbers !== false}
+                  />
                 </div>
               </div>
 
@@ -150,7 +197,7 @@ export function Dashboard() {
                         <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(val) => `$${val}`} />
                         <Tooltip 
                           contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
-                          formatter={(value: number) => [`$${value.toFixed(2)}`, 'Revenue']}
+                          formatter={(value: number) => [`${cSym}${value.toFixed(2)}`, 'Revenue']}
                         />
                         <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
                       </AreaChart>
@@ -243,7 +290,7 @@ export function Dashboard() {
                             <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">{cust.name}</div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">{cust.jobs} job{cust.jobs !== 1 ? 's' : ''}</div>
                           </div>
-                          <div className="font-bold text-slate-700 dark:text-slate-200 text-sm">${cust.revenue.toFixed(2)}</div>
+                          <div className="font-bold text-slate-700 dark:text-slate-200 text-sm">{cSym}{cust.revenue.toFixed(2)}</div>
                         </div>
                       ))}
                       {invoices.length === 0 && (
@@ -254,10 +301,12 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-
             </div>
-          </div>
-        </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </>
   );
