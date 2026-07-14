@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useAppContext } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
 import { createPortal } from 'react-dom';
+import confetti from 'canvas-confetti';
 
 export function InvoiceHistory() {
   const { state, updateState } = useAppContext();
   const invoices = state.invoices || [];
 
   const [isOpen, setIsOpen] = useState(false);
+  const [dragHoverCol, setDragHoverCol] = useState<string | null>(null);
 
   const handleStatusChange = (id: string, newStatus: 'Quoted' | 'Printing' | 'Post-Processing' | 'Completed', e?: React.ChangeEvent<HTMLSelectElement>) => {
     if (e) e.stopPropagation();
@@ -21,6 +23,14 @@ export function InvoiceHistory() {
         
         // If moving to Completed from something else
         if (newStatus === 'Completed' && oldStatus !== 'Completed') {
+          if (state.animationsEnabled?.jobTracker !== false) {
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+              colors: ['#3b82f6', '#10b981', '#f59e0b']
+            });
+          }
           // Deduct extra items
           inv.extraItems?.forEach(item => {
             if (item.inventoryItemId) {
@@ -104,11 +114,52 @@ export function InvoiceHistory() {
     e.dataTransfer.setData('jobId', id);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragEnd = () => {
+    setDragHoverCol(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, column: string) => {
     e.preventDefault(); // Necessary to allow dropping
+    if (dragHoverCol !== column) setDragHoverCol(column);
+  };
+
+  const handleEditJob = (inv: typeof invoices[0], e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (inv.savedState) {
+      updateState({
+        ...inv.savedState,
+        editingInvoiceId: inv.id
+      });
+      setIsOpen(false);
+    } else {
+      // Reconstruct best-effort state for old invoices
+      const customer = state.customers.find(c => c.name === inv.customerName);
+      updateState({
+        editingInvoiceId: inv.id,
+        projectName: inv.partName,
+        selectedCustomerId: customer ? customer.id : null,
+        extraItems: inv.extraItems || [],
+        parts: [{
+          id: Date.now().toString(),
+          name: 'Legacy Part',
+          isMultiMaterial: false,
+          materials: [{ id: Date.now().toString(), name: 'Unknown', costPerKg: 25, weight: 0 }],
+          printTimeHrs: 0,
+          printTimeMin: 0,
+          quantity: 1,
+        }],
+        postProcessingTasks: [],
+        laborTimeMin: 0,
+        hardwareCost: 0,
+        packagingCost: 0,
+        shippingCost: 0,
+      });
+      setIsOpen(false);
+    }
   };
 
   const handleDrop = (e: React.DragEvent, newStatus: 'Quoted' | 'Printing' | 'Post-Processing' | 'Completed') => {
+    setDragHoverCol(null);
     e.preventDefault();
     const jobId = e.dataTransfer.getData('jobId');
     if (jobId) {
@@ -184,6 +235,7 @@ export function InvoiceHistory() {
                   <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
                     <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Job Tracker</h2>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 ml-4 font-normal tracking-normal hidden md:inline-block">Click the edit button to modify a quote</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
@@ -216,9 +268,10 @@ export function InvoiceHistory() {
                   return (
                     <div 
                       key={column} 
-                      className="bg-white/30 dark:bg-slate-800/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/40 dark:border-slate-700/60 rounded-2xl flex flex-col min-h-[300px]"
-                      onDragOver={handleDragOver}
+                      className={`bg-white/30 dark:bg-slate-800/40 backdrop-blur-md border rounded-2xl flex flex-col min-h-[300px] transition-colors duration-300 ${dragHoverCol === column ? 'border-blue-400 bg-blue-50/30 dark:bg-blue-900/10 shadow-inner' : 'border-white/40 dark:border-slate-700/60'}`}
+                      onDragOver={(e) => handleDragOver(e, column)}
                       onDrop={(e) => handleDrop(e, column)}
+                      onDragLeave={() => setDragHoverCol(null)}
                     >
                       <div className="p-4 font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center border-b border-white/40 dark:border-slate-700/40">
                         {column}
@@ -227,11 +280,19 @@ export function InvoiceHistory() {
                         </span>
                       </div>
                       <div className="flex-1 p-3 overflow-y-auto custom-scrollbar space-y-3">
+                        <AnimatePresence mode="popLayout">
                         {[...columnInvoices].reverse().map(inv => (
-                          <div 
+                          <motion.div 
+                            layout={state.animationsEnabled?.jobTracker !== false}
+                            initial={state.animationsEnabled?.jobTracker !== false ? { opacity: 0, y: 10, scale: 0.95 } : false}
+                            animate={state.animationsEnabled?.jobTracker !== false ? { opacity: 1, y: 0, scale: 1 } : false}
+                            exit={state.animationsEnabled?.jobTracker !== false ? { opacity: 0, scale: 0.9, transition: { duration: 0.2 } } : false}
+                            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                             key={inv.id} 
                             draggable
-                            onDragStart={(e) => handleDragStart(e, inv.id)}
+                            onDragStart={(e) => handleDragStart(e, inv.id as string)}
+                            onDragEnd={handleDragEnd}
+                            onDoubleClick={(e) => handleEditJob(inv, e)}
                             className="bg-white/60 dark:bg-slate-800/60 border border-white/80 dark:border-slate-700/80 shadow-sm rounded-xl p-4 flex flex-col gap-3 transition-all duration-300 hover:bg-white/90 hover:border-blue-300 hover:shadow-md cursor-grab active:cursor-grabbing group"
                           >
                             <div>
@@ -264,6 +325,28 @@ export function InvoiceHistory() {
                               </select>
                               
                               <div className="flex items-center gap-1">
+                                {inv.status !== 'Completed' && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const currentStatus = inv.status || 'Quoted';
+                                      const nextStatus = currentStatus === 'Quoted' ? 'Printing' : currentStatus === 'Printing' ? 'Post-Processing' : 'Completed';
+                                      handleStatusChange(inv.id, nextStatus, undefined);
+                                    }}
+                                    className="p-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/20 rounded-md transition-colors mr-1"
+                                    title="Move to Next Stage"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                  </button>
+                                )}
+                                
+                                <button
+                                  onClick={(e) => handleEditJob(inv, e)}
+                                  className="p-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-md transition-colors"
+                                  title="Edit Job"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                </button>
                                 <button 
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -286,8 +369,9 @@ export function InvoiceHistory() {
                                 </button>
                               </div>
                             </div>
-                          </div>
+                          </motion.div>
                         ))}
+                      </AnimatePresence>
                       </div>
                     </div>
                   );

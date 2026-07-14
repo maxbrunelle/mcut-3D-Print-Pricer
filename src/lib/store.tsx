@@ -36,6 +36,7 @@ export interface SpoolDeduction {
 }
 
 export interface Invoice {
+  savedState?: any;
   id: string;
   invoiceNumber?: string;
   date: string;
@@ -102,6 +103,7 @@ export interface InventoryExtraItem {
 }
 
 export interface CalculatorState {
+  editingInvoiceId?: string | null;
   projectName: string;
   parts: ProjectPart[];
   selectedCustomerId: string | null;
@@ -155,6 +157,7 @@ export interface CalculatorState {
   isDarkMode: boolean;
   animationsEnabled: {
     popups: boolean;
+    jobTracker?: boolean;
     numbers: boolean;
     layouts: boolean;
   };
@@ -251,6 +254,7 @@ const defaultState: CalculatorState = {
   isDarkMode: false,
   animationsEnabled: {
     popups: true,
+    jobTracker: true,
     numbers: true,
     layouts: true,
   },

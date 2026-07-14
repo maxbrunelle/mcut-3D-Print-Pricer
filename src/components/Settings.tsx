@@ -544,6 +544,22 @@ export function Settings() {
                           
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
                             <div>
+                              <h5 className="font-semibold text-slate-700 dark:text-slate-200">Job Tracker Effects</h5>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Enable fluid drag-and-drop animations and completion effects.</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                              <input 
+                                type="checkbox" 
+                                className="sr-only peer"
+                                checked={state.animationsEnabled?.jobTracker ?? true}
+                                onChange={(e) => updateState({ animationsEnabled: { ...state.animationsEnabled, jobTracker: e.target.checked } })}
+                              />
+                              <div className="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-slate-600 peer-checked:bg-blue-500 shadow-inner"></div>
+                            </label>
+                          </div>
+                          
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
+                            <div>
                               <h5 className="font-semibold text-slate-700 dark:text-slate-200">Fluid Layouts</h5>
                               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Animate structural changes like adding or removing items.</p>
                             </div>

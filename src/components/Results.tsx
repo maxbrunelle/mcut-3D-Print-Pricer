@@ -107,7 +107,8 @@ export function Results() {
     const secondaryColor: [number, number, number] = [80, 80, 80];
 
     const selectedCustomer = state.customers.find(c => c.id === state.selectedCustomerId);
-    const invoiceNumber = state.nextInvoiceNumber.toString().padStart(6, '0');
+    const editingInv = state.editingInvoiceId ? state.invoices?.find(i => i.id === state.editingInvoiceId) : null;
+    const invoiceNumber = editingInv?.invoiceNumber || state.nextInvoiceNumber.toString().padStart(6, '0');
 
     // Header - Logo and No.
     doc.setFontSize(36);
@@ -411,7 +412,8 @@ export function Results() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      const invoiceNumber = state.nextInvoiceNumber.toString().padStart(6, '0');
+      const editingInv = state.editingInvoiceId ? state.invoices?.find(i => i.id === state.editingInvoiceId) : null;
+    const invoiceNumber = editingInv?.invoiceNumber || state.nextInvoiceNumber.toString().padStart(6, '0');
       link.download = `Invoice-${invoiceNumber}.pdf`;
       document.body.appendChild(link);
       link.click();
@@ -434,22 +436,68 @@ export function Results() {
       });
 
       const selectedCustomer = state.customers.find(c => c.id === state.selectedCustomerId);
-      const newInvoice = {
-        id: Date.now().toString(),
-        invoiceNumber,
-        date: new Date().toISOString(),
-        partName: state.projectName || 'New Project',
-        customerName: selectedCustomer ? selectedCustomer.name : 'Unknown Customer',
-        totalAmount: batchTotal,
-        pdfDataUri: `data:application/pdf;base64,${base64}`,
-        extraItems: state.extraItems,
-        status: 'Quoted' as const,
-        spoolDeductions
+      const savedState = {
+        projectName: state.projectName,
+        selectedCustomerId: state.selectedCustomerId,
+        parts: JSON.parse(JSON.stringify(state.parts)),
+        postProcessingTasks: JSON.parse(JSON.stringify(state.postProcessingTasks)),
+        extraItems: JSON.parse(JSON.stringify(state.extraItems)),
+        laborTimeMin: state.laborTimeMin,
+        hardwareCost: state.hardwareCost,
+        packagingCost: state.packagingCost,
+        shippingCost: state.shippingCost,
+        discountType: state.discountType,
+        discountValue: state.discountValue,
+        applyTaxes: state.applyTaxes,
+        gstRate: state.gstRate,
+        qstRate: state.qstRate,
+        paymentTerms: state.paymentTerms,
+        invoiceNotes: state.invoiceNotes,
+        selectedMargin: state.selectedMargin,
+        customMargin: state.customMargin,
       };
+
+      let updatedInvoices = [...(state.invoices || [])];
+      
+      if (state.editingInvoiceId) {
+        // Update existing
+        updatedInvoices = updatedInvoices.map(inv => {
+          if (inv.id === state.editingInvoiceId) {
+            return {
+              ...inv,
+              date: new Date().toISOString(),
+              partName: state.projectName || 'New Project',
+              customerName: selectedCustomer ? selectedCustomer.name : 'Unknown Customer',
+              totalAmount: batchTotal,
+              pdfDataUri: `data:application/pdf;base64,${base64}`,
+              extraItems: state.extraItems,
+              spoolDeductions,
+              savedState
+            };
+          }
+          return inv;
+        });
+      } else {
+        const newInvoice = {
+          id: Date.now().toString(),
+          invoiceNumber,
+          date: new Date().toISOString(),
+          partName: state.projectName || 'New Project',
+          customerName: selectedCustomer ? selectedCustomer.name : 'Unknown Customer',
+          totalAmount: batchTotal,
+          pdfDataUri: `data:application/pdf;base64,${base64}`,
+          extraItems: state.extraItems,
+          status: 'Quoted' as const,
+          spoolDeductions,
+          savedState
+        };
+        updatedInvoices.push(newInvoice);
+      }
       
       updateState({ 
-        invoices: [...(state.invoices || []), newInvoice],
-        nextInvoiceNumber: state.nextInvoiceNumber + 1,
+        invoices: updatedInvoices,
+        nextInvoiceNumber: state.editingInvoiceId ? state.nextInvoiceNumber : state.nextInvoiceNumber + 1,
+        editingInvoiceId: null,
         projectName: '',
         parts: [
           {
@@ -598,10 +646,19 @@ export function Results() {
         </div>
         
         <div className="flex gap-3">
+          {state.editingInvoiceId && (
+            <button
+              onClick={() => updateState({ editingInvoiceId: null })}
+              className="flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-2xl font-bold transition-all duration-300 backdrop-blur-sm"
+              title="Cancel Edit"
+            >
+              Cancel
+            </button>
+          )}
           <button 
             onClick={savePdfLocal}
             disabled={isSyncing}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white/60 dark:bg-slate-800/60 hover:bg-white/80 dark:bg-slate-800/80 border border-white/60 dark:border-slate-700/60 shadow-[0_4px_12px_rgba(255,255,255,0.2)] text-slate-800 dark:text-slate-100 rounded-2xl font-bold transition-all duration-300 backdrop-blur-sm"
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 border shadow-[0_4px_12px_rgba(255,255,255,0.2)] rounded-2xl font-bold transition-all duration-300 backdrop-blur-sm ${state.editingInvoiceId ? 'bg-blue-500 hover:bg-blue-600 border-blue-400/50 text-white' : 'bg-white/60 dark:bg-slate-800/60 hover:bg-white/80 dark:bg-slate-800/80 border-white/60 dark:border-slate-700/60 text-slate-800 dark:text-slate-100'}`}
           >
             {isSyncing ? (
               <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -611,7 +668,7 @@ export function Results() {
             ) : (
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
             )}
-            Save Quote
+            {state.editingInvoiceId ? 'Update Quote' : 'Save Quote'}
           </button>
           
           {navigator.canShare && (
@@ -625,7 +682,8 @@ export function Results() {
                   for (let i = 0; i < len; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
                   }
-                  const invoiceNumber = state.nextInvoiceNumber.toString().padStart(6, '0');
+                  const editingInv = state.editingInvoiceId ? state.invoices?.find(i => i.id === state.editingInvoiceId) : null;
+    const invoiceNumber = editingInv?.invoiceNumber || state.nextInvoiceNumber.toString().padStart(6, '0');
                   const file = new File([bytes], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' });
                   
                   if (navigator.canShare({ files: [file] })) {
