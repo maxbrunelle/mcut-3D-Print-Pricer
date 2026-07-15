@@ -25,6 +25,24 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts') || id.includes('d3-')) {
+              return 'charts';
+            }
+            if (id.includes('react') || id.includes('framer-motion') || id.includes('three') || id.includes('lucide')) {
+              return 'vendor';
+            }
+            return 'utils';
+          }
+        }
+      }
+    }
+  },
   server: {
     port: 3000,
     host: '0.0.0.0',

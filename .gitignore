@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-ssr
+dist_electron
+*.local
+.env
+.env.*
+!.env.example
+.vite
+bun.lock
+bun.lockb
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+*.AppImage
+.DS_Store
