@@ -1,3 +1,4 @@
+import { Calendar } from "lucide-react";
 import { SpoolCombobox } from "./SpoolCombobox";
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
@@ -249,10 +250,23 @@ export function Calculator() {
       </div>
 
       <div className="space-y-6">
-        {/* PROJECT NAME */}
-        <div>
-          <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Project Name</label>
-          <input type="text" name="projectName" value={state.projectName} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" placeholder="e.g. Mechanical Keyboard Case" />
+        {/* PROJECT NAME & DUE DATE */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Project Name</label>
+                        <input type="text" name="projectName" value={state.projectName} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" placeholder="e.g. Mechanical Keyboard Case" />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+              <Calendar size={16} className="text-blue-500" />
+              Target Schedule Date
+            </label>
+            <input type="date" name="dueDate" value={state.dueDate || ''} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Due / Scheduled Date</label>
+            <input type="date" name="dueDate" value={state.dueDate || ''} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -685,9 +699,28 @@ export function Calculator() {
                 <div className={`block w-12 h-6 rounded-full transition-colors ${state.applyTaxes !== false ? 'bg-blue-500' : 'bg-slate-300'}`}></div>
                 <div className={`absolute left-1 top-1 bg-white dark:bg-slate-800 w-4 h-4 rounded-full transition-transform ${state.applyTaxes !== false ? 'translate-x-6' : ''}`}></div>
               </div>
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-200 select-none group-hover:text-slate-900 dark:hover:text-slate-50 dark:text-slate-50 transition-colors">Apply Taxes</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200 select-none group-hover:text-slate-900 dark:hover:text-slate-50 transition-colors">Apply Taxes</span>
             </label>
           </div>
+          
+          {/* IN-HOUSE JOB */}
+          <div className="flex items-center h-[50px] mb-1">
+            <label className="flex items-center gap-3 cursor-pointer group" title="In-House jobs have a final price of $0 but still track material/machine costs.">
+              <div className="relative">
+                <input 
+                  type="checkbox" 
+                  name="isInHouseJob" 
+                  checked={state.isInHouseJob === true} 
+                  onChange={handleChange} 
+                  className="sr-only text-slate-800 dark:text-white" 
+                />
+                <div className={`block w-12 h-6 rounded-full transition-colors ${state.isInHouseJob === true ? 'bg-indigo-500' : 'bg-slate-300'}`}></div>
+                <div className={`absolute left-1 top-1 bg-white dark:bg-slate-800 w-4 h-4 rounded-full transition-transform ${state.isInHouseJob === true ? 'translate-x-6' : ''}`}></div>
+              </div>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200 select-none group-hover:text-slate-900 dark:hover:text-slate-50 transition-colors">In-House / Free Job</span>
+            </label>
+          </div>
+
           {/* GST RATE */}
           <div className={state.applyTaxes === false ? 'opacity-50 pointer-events-none' : ''}>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">GST Rate (QC)</label>

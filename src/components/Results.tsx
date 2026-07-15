@@ -97,6 +97,7 @@ export function Results() {
   const subtotal = baseCost + failureCost;
   
   const calculateTotal = (margin: number) => {
+    if (state.isInHouseJob) return 0;
     const markupAmount = subtotal * (margin / 100);
     let preTaxTotal = subtotal + markupAmount + (state.shippingCost || 0) + extraItemsTotal;
     
@@ -114,6 +115,7 @@ export function Results() {
   };
   
   const calculatePreTax = (margin: number) => {
+    if (state.isInHouseJob) return 0;
     const markupAmount = subtotal * (margin / 100);
     let preTaxTotal = subtotal + markupAmount + (state.shippingCost || 0) + extraItemsTotal;
     const discountVal = state.discountValue || 0;
@@ -147,9 +149,16 @@ export function Results() {
     doc.setTextColor(...primaryColor);
     doc.text('INVOICE', 14, 20);
     
+    if (state.isInHouseJob) {
+      doc.setFontSize(12);
+      doc.setTextColor(79, 70, 229); // Indigo 600
+      doc.text('IN-HOUSE / FREE JOB', 14, 27);
+    }
+    
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`NO. ${invoiceNumber}`, 14, 28);
+    doc.setTextColor(...primaryColor);
+    doc.text(`NO. ${invoiceNumber}`, 14, state.isInHouseJob ? 33 : 28);
 
     if (state.invoiceLogo) {
       try {
@@ -279,8 +288,8 @@ export function Results() {
     const safeProjectName = (state.projectName || 'New Project').replace(/[^\x00-\x7F]/g, '');
     
     // Total for the whole project pre-tax based on margin
-    const subtotalRaw = subtotal * (1 + activeMargin / 100);
-    const tableSubtotal = subtotalRaw + extraItemsTotal;
+    const subtotalRaw = state.isInHouseJob ? 0 : subtotal * (1 + activeMargin / 100);
+    const tableSubtotal = state.isInHouseJob ? 0 : subtotalRaw + extraItemsTotal;
     const preTaxProjectTotal = calculatePreTax(activeMargin);
     const finalBatchTotal = calculateTotal(activeMargin);
     const gstAmount = state.applyTaxes ? preTaxProjectTotal * (state.gstRate / 100) : 0;
@@ -493,6 +502,7 @@ export function Results() {
       const selectedCustomer = state.customers.find(c => c.id === state.selectedCustomerId);
       const savedState = {
         projectName: state.projectName,
+        dueDate: state.dueDate,
         selectedCustomerId: state.selectedCustomerId,
         parts: JSON.parse(JSON.stringify(state.parts)),
         postProcessingTasks: JSON.parse(JSON.stringify(state.postProcessingTasks)),
@@ -504,6 +514,7 @@ export function Results() {
         discountType: state.discountType,
         discountValue: state.discountValue,
         applyTaxes: state.applyTaxes,
+        isInHouseJob: state.isInHouseJob,
         gstRate: state.gstRate,
         qstRate: state.qstRate,
         paymentTerms: state.paymentTerms,
@@ -521,6 +532,7 @@ export function Results() {
             return {
               ...inv,
               date: new Date().toISOString(),
+              dueDate: state.dueDate || undefined,
               partName: state.projectName || 'New Project',
               customerName: selectedCustomer ? selectedCustomer.name : 'Unknown Customer',
               totalAmount: batchTotal,
@@ -537,6 +549,7 @@ export function Results() {
           id: Date.now().toString(),
           invoiceNumber,
           date: new Date().toISOString(),
+          dueDate: state.dueDate || undefined,
           partName: state.projectName || 'New Project',
           customerName: selectedCustomer ? selectedCustomer.name : 'Unknown Customer',
           totalAmount: batchTotal,
@@ -554,6 +567,7 @@ export function Results() {
         nextInvoiceNumber: state.editingInvoiceId ? state.nextInvoiceNumber : state.nextInvoiceNumber + 1,
         editingInvoiceId: null,
         projectName: '',
+        dueDate: null,
         parts: [
           {
             id: Date.now().toString(),
@@ -574,6 +588,7 @@ export function Results() {
         hardwareCost: 0,
         packagingCost: 0,
         shippingCost: 0,
+        isInHouseJob: false,
         discountValue: 0
       });
     } catch (error: any) {
@@ -710,6 +725,12 @@ export function Results() {
       </div>
 
       <div className="mt-8 pt-6 border-t border-white/40 dark:border-slate-700/40 flex flex-col items-stretch gap-4">
+        {state.isInHouseJob && (
+          <div className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            In-House Job (Total is $0, but costs are tracked)
+          </div>
+        )}
         <div className="flex justify-between items-center text-sm text-slate-700 dark:text-slate-200 px-2 drop-shadow-sm">
           <span className="flex items-center gap-1">Total Project: 
             <AnimatedNumber 

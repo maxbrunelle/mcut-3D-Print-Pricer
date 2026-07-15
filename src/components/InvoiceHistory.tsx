@@ -129,7 +129,8 @@ export function InvoiceHistory() {
     if (inv.savedState) {
       updateState({
         ...inv.savedState,
-        editingInvoiceId: inv.id
+        editingInvoiceId: inv.id,
+        activeView: 'calculator'
       });
       setIsOpen(false);
     } else {
@@ -154,6 +155,7 @@ export function InvoiceHistory() {
         hardwareCost: 0,
         packagingCost: 0,
         shippingCost: 0,
+        activeView: 'calculator'
       });
       setIsOpen(false);
     }
@@ -207,32 +209,8 @@ export function InvoiceHistory() {
   };
 
   return (
-    <>
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:bg-slate-800/70 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 backdrop-blur-md font-medium"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
-        Job Tracker ({invoices.length})
-      </button>
-
-      {createPortal(
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div 
-              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
-              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
-              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
-              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
-            >
-              <motion.div 
-                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
-                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
-                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
-                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
-                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-[1400px] h-[90vh] flex flex-col"
-              >
-                <div className="flex justify-between items-center mb-6">
+    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 flex flex-col h-full animate-in fade-in zoom-in-95 duration-300">
+      <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h10"/><path d="M7 11h10"/><path d="M7 15h10"/></svg>
                     <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Job Tracker</h2>
@@ -258,12 +236,7 @@ export function InvoiceHistory() {
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>
                       Export CSV
                     </button>
-                    <button 
-                      onClick={() => setIsOpen(false)}
-                      className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-                    </button>
+                    
                   </div>
                 </div>
 
@@ -274,14 +247,12 @@ export function InvoiceHistory() {
                 <p className="text-sm mt-1">Save a quote to see it appear here.</p>
               </div>
             ) : (
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-4 overflow-y-auto lg:overflow-y-hidden">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 pb-4 overflow-y-auto xl:overflow-y-hidden h-full">
                 {columns.map(column => {
                   const columnInvoices = invoices.filter(inv => (inv.status || 'Quoted') === column);
                   
                   return (
-                    <div 
-                      key={column} 
-                      className={`bg-white/30 dark:bg-slate-800/40 backdrop-blur-md border rounded-2xl flex flex-col min-h-[300px] transition-colors duration-300 ${dragHoverCol === column ? 'border-blue-400 bg-blue-50/30 dark:bg-blue-900/10 shadow-inner' : 'border-white/40 dark:border-slate-700/60'}`}
+                    <div key={column} className={`bg-white/30 dark:bg-slate-800/40 backdrop-blur-md border rounded-2xl flex flex-col min-h-[300px] transition-colors duration-300 ${dragHoverCol === column ? "border-blue-400 bg-blue-50/30 dark:bg-blue-900/10 shadow-inner" : "border-white/40 dark:border-slate-700/60"}`}
                       onDragOver={(e) => handleDragOver(e, column)}
                       onDrop={(e) => handleDrop(e, column)}
                       onDragLeave={() => setDragHoverCol(null)}
@@ -310,16 +281,24 @@ export function InvoiceHistory() {
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2 mb-1">
-                                <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight">{inv.partName}</h3>
+                                <h3 className="font-bold text-slate-800 dark:text-slate-100 leading-tight break-words min-w-0 flex-1">
+                                  {inv.partName}
+                                  {inv.savedState?.isInHouseJob && (
+                                    <span className="ml-2 inline-flex items-center gap-1 text-[10px] uppercase font-bold text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40 dark:text-indigo-400 px-1.5 py-0.5 rounded" title="In-House / Free Job">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                      In-House
+                                    </span>
+                                  )}
+                                </h3>
                                 <button 
                                   onClick={(e) => handleDelete(inv.id, e)}
-                                  className="p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                                  className="p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors opacity-0 group-hover:opacity-100 shrink-0"
                                   aria-label="Delete job"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                                 </button>
                               </div>
-                              <div className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 inline-block mb-2">
+                              <div className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 inline-block mb-2 break-all">
                                 {inv.customerName}
                               </div>
                               <div className="text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center">
@@ -328,7 +307,7 @@ export function InvoiceHistory() {
                               </div>
                             </div>
                             
-                            <div className="pt-3 border-t border-white/60 dark:border-slate-700/60 flex items-center justify-between gap-2">
+                            <div className="pt-3 border-t border-white/60 dark:border-slate-700/60 flex items-center justify-between gap-2 flex-wrap">
                               <select
                                 value={inv.status || 'Quoted'}
                                 onChange={(e) => handleStatusChange(inv.id, e.target.value as any, e)}
@@ -337,7 +316,7 @@ export function InvoiceHistory() {
                                 {columns.map(c => <option key={c} value={c}>{c}</option>)}
                               </select>
                               
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
                                 {inv.status !== 'Completed' && (
                                   <button
                                     onClick={(e) => {
@@ -391,12 +370,6 @@ export function InvoiceHistory() {
                 })}
               </div>
             )}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-    </>
+    </div>
   );
 }

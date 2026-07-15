@@ -69,42 +69,13 @@ export function ExtraItemInventory() {
   };
 
   return (
-    <>
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="text-sm bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:bg-slate-800/70 border border-white/40 dark:border-slate-700/40 shadow-sm text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 backdrop-blur-md font-medium"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
-        Manage Extra Items ({inventory.length})
-      </button>
-
-      {createPortal(
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div 
-              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
-              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
-              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
-              className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
-            >
-              <motion.div 
-                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
-                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
-                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
-                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
-                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-5xl max-h-[90vh] flex flex-col"
-              >
-                <div className="flex justify-between items-center mb-6">
+    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 flex flex-col h-full animate-in fade-in zoom-in-95 duration-300">
+      <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
                     <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Extra Items Inventory</h2>
                   </div>
-                  <button 
-                    onClick={() => setIsOpen(false)}
-                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
-                  </button>
+                  
             </div>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col md:flex-row gap-6 pr-2">
@@ -250,12 +221,6 @@ export function ExtraItemInventory() {
                 </div>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
-        )}
-        </AnimatePresence>,
-        document.body
-      )}
-    </>
+    </div>
   );
 }

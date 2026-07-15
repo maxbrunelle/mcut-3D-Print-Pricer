@@ -7,11 +7,9 @@ import { SpoolInventory } from './components/SpoolInventory';
 import { ExtraItemInventory } from './components/ExtraItemInventory';
 import { Dashboard } from './components/Dashboard';
 import { PrinterManagement } from './components/PrinterManagement';
-import { CustomersView } from './components/CustomersView';
 import { JobScheduler } from './components/JobScheduler';
 import { InstallPWA } from './components/InstallPWA';
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
 
 export const THEMES: Record<string, { bg: string, blob1: string, blob2: string, blob3: string }> = {
   'indigo-cyan': {
@@ -58,46 +56,34 @@ function AppContent() {
     }
   }, [state.isDarkMode]);
 
-  const activeView = state.activeView || 'calculator';
-
   return (
-    <div className={`h-screen flex font-sans bg-gradient-to-br ${theme.bg} relative overflow-hidden transition-colors duration-1000`}>
+    <div className={`min-h-screen p-4 md:p-8 font-sans bg-gradient-to-br ${theme.bg} relative overflow-clip transition-colors duration-1000`}>
       {/* Animated ambient background blobs */}
       <div className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full ${theme.blob1} blur-3xl mix-blend-multiply dark:mix-blend-screen transition-colors duration-1000`}></div>
       <div className={`absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full ${theme.blob2} blur-3xl mix-blend-multiply dark:mix-blend-screen transition-colors duration-1000`}></div>
       <div className={`absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full ${theme.blob3} blur-3xl mix-blend-multiply dark:mix-blend-screen transition-colors duration-1000`}></div>
       
-      {/* Sidebar */}
-      <Sidebar />
+      <div className="max-w-6xl mx-auto relative z-10">
+        <Header />
 
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-8 relative z-10 custom-scrollbar">
-        <div className="max-w-6xl mx-auto h-full flex flex-col">
-          <Header />
-          
-          <div className="flex-1 mt-4">
-            {activeView === 'calculator' && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div className="lg:col-span-7 space-y-8">
-                  <Calculator />
-                </div>
-                <div className="lg:col-span-5 lg:sticky lg:top-8 self-start">
-                  <Results />
-                </div>
-              </div>
-            )}
-            
-            {activeView === 'dashboard' && <Dashboard />}
-            {activeView === 'scheduler' && <JobScheduler />}
-            {activeView === 'history' && <InvoiceHistory />}
-            {activeView === 'spools' && <SpoolInventory />}
-            {activeView === 'items' && <ExtraItemInventory />}
-            {activeView === 'printers' && <PrinterManagement />}
-            {activeView === 'customers' && <CustomersView />}
+        <div className="mb-8 flex flex-wrap gap-4">
+          <InvoiceHistory />
+          <JobScheduler />
+          <SpoolInventory /><ExtraItemInventory />
+          <PrinterManagement />
+          <Dashboard />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-7 space-y-8">
+            <Calculator />
+          </div>
+
+          <div className="lg:col-span-5 lg:sticky lg:top-8 self-start">
+            <Results />
           </div>
         </div>
       </div>
-      
       <InstallPWA />
     </div>
   );
@@ -112,3 +98,4 @@ function App() {
 }
 
 export default App;
+

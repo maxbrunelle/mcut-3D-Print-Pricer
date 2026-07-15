@@ -40,6 +40,7 @@ export interface Invoice {
   id: string;
   invoiceNumber?: string;
   date: string;
+  dueDate?: string;
   partName: string;
   customerName: string;
   totalAmount: number;
@@ -57,6 +58,16 @@ export interface MaintenanceLog {
   task: string;
   cost: number;
   notes: string;
+}
+
+export interface ScheduledJob {
+  id: string;
+  invoiceId: string;
+  partId?: string; // Optional: if we want to schedule individual parts
+  printerId: string;
+  title: string;
+  startTime: string; // ISO date
+  endTime: string; // ISO date
 }
 
 export interface Printer {
@@ -110,14 +121,17 @@ export interface InvoicePreferences {
 }
 
 export interface CalculatorState {
+  activeView?: 'calculator' | 'dashboard' | 'scheduler' | 'history' | 'spools' | 'items' | 'printers' | 'customers';
   editingInvoiceId?: string | null;
   projectName: string;
+  dueDate?: string | null;
   parts: ProjectPart[];
   selectedCustomerId: string | null;
   customers: Customer[];
   nextClientNumber: number;
   nextInvoiceNumber: number;
   invoices: Invoice[];
+  scheduledJobs?: ScheduledJob[];
   spools: Spool[];
   printers: Printer[];
   postProcessingTasks: PostProcessingTask[];
@@ -131,6 +145,7 @@ export interface CalculatorState {
   discountType: 'percentage' | 'fixed';
   discountValue: number;
   applyTaxes: boolean;
+  isInHouseJob?: boolean;
   gstRate: number;
   qstRate: number;
   paymentTerms: string;
@@ -184,6 +199,7 @@ interface AppState {
 
 const defaultState: CalculatorState = {
   projectName: '',
+  dueDate: null,
   parts: [
     {
       id: '1',
@@ -202,6 +218,7 @@ const defaultState: CalculatorState = {
   nextClientNumber: 1,
   nextInvoiceNumber: 1,
   invoices: [],
+  scheduledJobs: [],
   printers: [
     { id: '1', name: 'Prusa MK3S+', model: 'MK3S+', powerWatts: 250, cost: 800, lifespanHours: 10000 }
   ],
@@ -237,6 +254,7 @@ const defaultState: CalculatorState = {
   discountType: 'percentage',
   discountValue: 0,
   applyTaxes: true,
+  isInHouseJob: false,
   gstRate: 5,
   qstRate: 9.975,
   paymentTerms: 'Due on Receipt',
