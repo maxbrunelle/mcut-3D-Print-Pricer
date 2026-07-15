@@ -261,7 +261,13 @@ export function Calculator() {
             <div className="flex justify-between items-center mb-2">
               <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Customer</label>
               <div className="flex gap-4">
-                
+                <button 
+                  onClick={() => setShowManageCustomersModal(true)}
+                  className="text-xs text-slate-600 dark:text-slate-300 font-medium hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 flex items-center gap-1 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  Manage
+                </button>
                 <button 
                   onClick={() => setShowCustomerModal(true)}
                   className="text-xs text-blue-600 font-medium hover:text-blue-800 flex items-center gap-1 transition-colors"
