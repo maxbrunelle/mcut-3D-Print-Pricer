@@ -1,7 +1,8 @@
 import React from 'react';
+import { Menu } from 'lucide-react';
 import { useAppContext } from '../lib/store';
 
-export function Header() {
+export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const { state } = useAppContext();
   
   const activeViewLabel = {
@@ -18,6 +19,12 @@ export function Header() {
   return (
     <header className="mb-6 flex items-center justify-between">
       <div className="flex items-center gap-4">
+        <button 
+          onClick={onMenuClick}
+          className="md:hidden p-2.5 -ml-2 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 rounded-xl transition-colors"
+        >
+          <Menu size={24} />
+        </button>
         
         <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-3">
           {activeViewLabel}

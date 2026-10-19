@@ -13,10 +13,13 @@ import {
   Printer,
   Moon,
   Sun,
-  Users
+  Users,
+  Wrench,
+  PenTool,
+  X
 } from 'lucide-react';
 
-export function Sidebar() {
+export function Sidebar({ isOpen, onClose }: { isOpen?: boolean, onClose?: () => void }) {
   const { state, updateState } = useAppContext();
   const activeView = state.activeView || 'calculator';
 
@@ -29,17 +32,38 @@ export function Sidebar() {
     { id: 'items', label: 'Extra Items', icon: Box },
     { id: 'printers', label: 'Printers', icon: Printer },
     { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'tasks', label: 'Tasks', icon: Wrench },
+    { id: 'services', label: 'CAD & Scanning', icon: PenTool },
   ];
 
+  
   return (
-    <div className="w-64 h-full border-r border-slate-200/50 dark:border-slate-700/50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex flex-col z-20 shadow-lg transition-colors">
-            <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50 flex items-center gap-3 justify-center">
-        {state.appLogo ? (
-          <img src={state.appLogo} alt="App logo" className="max-h-12 w-full object-contain drop-shadow-sm" />
-        ) : (
-          <img src="/mcut-logo.svg" alt="App logo" className="max-h-12 w-full object-contain drop-shadow-sm" />
-        )}
-      </div>
+    <>
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+      
+      {/* Sidebar container */}
+      <div className={`fixed md:static inset-y-0 left-0 w-64 h-full border-r border-slate-200/50 dark:border-slate-700/50 bg-white/90 dark:bg-slate-900/90 md:bg-white/70 md:dark:bg-slate-900/70 backdrop-blur-xl flex flex-col z-50 shadow-lg transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        
+        <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between gap-3">
+          {state.appLogo ? (
+            <img src={state.appLogo} alt="App logo" className="max-h-12 object-contain drop-shadow-sm flex-1" />
+          ) : (
+            <img src="/mcut-logo.svg" alt="App logo" className="max-h-12 object-contain drop-shadow-sm flex-1" />
+          )}
+          
+          <button 
+            onClick={onClose}
+            className="md:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -48,8 +72,8 @@ export function Sidebar() {
           return (
             <button
               key={item.id}
-              onClick={() => updateState({ activeView: item.id as any })}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              onClick={() => { updateState({ activeView: item.id as any }); if (onClose) onClose(); }}
+              className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive 
                   ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' 
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
@@ -76,5 +100,6 @@ export function Sidebar() {
         <Settings />
       </div>
     </div>
+    </>
   );
 }

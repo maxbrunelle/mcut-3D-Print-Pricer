@@ -97,6 +97,21 @@ export interface PostProcessingTask {
   timeMin: number;
 }
 
+export interface InventoryDesignService {
+  id: string;
+  name: string;
+  pricePerHour: number;
+}
+
+export interface DesignTask {
+  id: string;
+  name: string;
+  timeHrs: number;
+  timeMin: number;
+  pricePerHour: number;
+  inventoryServiceId?: string;
+}
+
 export interface ExtraItem {
   id: string;
   name: string;
@@ -121,8 +136,9 @@ export interface InvoicePreferences {
 }
 
 export interface CalculatorState {
-  activeView?: 'calculator' | 'dashboard' | 'scheduler' | 'history' | 'spools' | 'items' | 'printers' | 'customers';
+  activeView?: 'calculator' | 'dashboard' | 'scheduler' | 'history' | 'spools' | 'items' | 'printers' | 'customers' | 'tasks' | 'services';
   editingInvoiceId?: string | null;
+  inspectingInvoiceId?: string | null;
   projectName: string;
   dueDate?: string | null;
   parts: ProjectPart[];
@@ -137,6 +153,10 @@ export interface CalculatorState {
   postProcessingTasks: PostProcessingTask[];
   extraItems: ExtraItem[];
   inventoryExtraItems: InventoryExtraItem[];
+  inventoryPostProcessingTasks: PostProcessingTask[];
+  inventoryDesignServices?: InventoryDesignService[];
+  designTasks?: DesignTask[];
+
   
   laborTimeMin: number;
   hardwareCost: number;
@@ -247,6 +267,16 @@ const defaultState: CalculatorState = {
   postProcessingTasks: [],
   extraItems: [],
   inventoryExtraItems: [],
+  inventoryDesignServices: [
+    { id: '1', name: '3D Scanning', pricePerHour: 50 },
+    { id: '2', name: 'CAD Design', pricePerHour: 45 }
+  ],
+  designTasks: [],
+  inventoryPostProcessingTasks: [
+    { id: '1', name: 'Sanding', timeMin: 15 },
+    { id: '2', name: 'Support Removal', timeMin: 10 },
+    { id: '3', name: 'Painting', timeMin: 30 }
+  ],
   laborTimeMin: 0,
   hardwareCost: 0,
   packagingCost: 0,

@@ -112,16 +112,16 @@ export function PrinterManagement() {
 
   return (
     <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 flex flex-col h-full animate-in fade-in zoom-in-95 duration-300">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
         <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
           <h2 className="text-xl font-bold uppercase tracking-widest">Printer Management</h2>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-[400px]">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 flex-1 min-h-[400px]">
         {/* LEFT PANE */}
-        <div className="col-span-1 border-r border-slate-100 dark:border-slate-800 pr-6 flex flex-col h-full overflow-hidden">
+        <div className="col-span-1 border-b lg:border-r border-slate-100 dark:border-slate-800 pb-6 lg:pb-0 pr-0 lg:pr-6 lg:border-b-0 flex flex-col h-full overflow-hidden shrink-0 min-h-[250px]">
           <button 
             onClick={() => handleOpenForm()} 
             className="w-full mb-4 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 py-3 rounded-xl border border-blue-200 dark:border-blue-800/30 font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors flex items-center justify-center gap-2 shadow-sm"
@@ -142,10 +142,10 @@ export function PrinterManagement() {
                   onClick={() => handleOpenForm(p)}
                   className={`p-3 rounded-xl cursor-pointer transition-all border ${editingPrinterId === p.id ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 shadow-sm' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50 hover:border-blue-300 dark:hover:border-blue-600'}`}
                 >
-                  <div className="font-semibold text-slate-800 dark:text-slate-200">{p.name}</div>
+                  <div className="font-semibold text-slate-800 dark:text-slate-200 truncate">{p.name}</div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex justify-between">
-                    <span>{p.model}</span>
-                    <button onClick={(e) => handleDeletePrinter(p.id, e)} className="text-red-400 hover:text-red-600">
+                    <span className="truncate pr-2">{p.model}</span>
+                    <button onClick={(e) => handleDeletePrinter(p.id, e)} className="text-red-400 hover:text-red-600 shrink-0">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                     </button>
                   </div>
@@ -156,10 +156,10 @@ export function PrinterManagement() {
         </div>
         
         {/* RIGHT PANE */}
-        <div className="col-span-1 md:col-span-2 flex flex-col h-full">
+        <div className="col-span-1 md:col-span-2 lg:col-span-2 flex flex-col h-full">
           {(editingPrinterId || isAdding) ? (
             <div className="flex flex-col flex-1 h-full">
-<div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+<div className="flex flex-wrap gap-4 justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
                           <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">
                             {editingPrinterId ? 'Edit Printer' : 'Add New Printer'}
                           </h3>
@@ -206,7 +206,7 @@ export function PrinterManagement() {
                                 />
                               </div>
 
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Power Draw (Watts)</label>
                                   <div className="relative">
@@ -246,7 +246,7 @@ export function PrinterManagement() {
                               </div>
                             </div>
 
-                            <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800 flex-wrap">
                               <button 
                                 onClick={handleSavePrinter}
                                 disabled={!formState.name}
@@ -268,14 +268,15 @@ export function PrinterManagement() {
                           <div className="flex flex-col flex-1 h-full overflow-hidden">
                             <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
                               <h4 className="text-sm font-semibold mb-3 text-slate-700 dark:text-slate-300">Log Maintenance Task</h4>
-                              <div className="grid grid-cols-2 gap-3 mb-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                                 <div>
                                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Date</label>
                                   <input 
-                                    type="date" 
+                                    type="date"
+                                      
                                     value={maintenanceForm.date || ''}
                                     onChange={e => setMaintenanceForm({...maintenanceForm, date: e.target.value})}
-                                    className="w-full px-3 py-1.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-100"
+                                    className="min-w-0 max-w-full appearance-none w-full px-3 py-1.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-100"
                                   />
                                 </div>
                                 <div>

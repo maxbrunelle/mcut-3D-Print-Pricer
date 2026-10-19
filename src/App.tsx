@@ -5,6 +5,8 @@ import { Results } from './components/Results';
 import { InvoiceHistory } from './components/InvoiceHistory';
 import { SpoolInventory } from './components/SpoolInventory';
 import { ExtraItemInventory } from './components/ExtraItemInventory';
+import { PostProcessingInventory } from './components/PostProcessingInventory';
+import { DesignServicesView } from './components/DesignServicesView';
 import { Dashboard } from './components/Dashboard';
 import { PrinterManagement } from './components/PrinterManagement';
 import { CustomersView } from './components/CustomersView';
@@ -47,6 +49,7 @@ export const THEMES: Record<string, { bg: string, blob1: string, blob2: string, 
 };
 
 function AppContent() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { state } = useAppContext();
   const theme = THEMES[state.appTheme] || THEMES['indigo-cyan'];
 
@@ -68,12 +71,12 @@ function AppContent() {
       <div className={`absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full ${theme.blob3} blur-3xl mix-blend-multiply dark:mix-blend-screen transition-colors duration-1000`}></div>
       
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-8 relative z-10 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 relative z-10 custom-scrollbar w-full overflow-x-hidden">
         <div className="max-w-6xl mx-auto h-full flex flex-col">
-          <Header />
+          <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
           
           <div className="flex-1 mt-4">
             {activeView === 'calculator' && (
@@ -94,6 +97,8 @@ function AppContent() {
             {activeView === 'items' && <ExtraItemInventory />}
             {activeView === 'printers' && <PrinterManagement />}
             {activeView === 'customers' && <CustomersView />}
+            {activeView === 'tasks' && <PostProcessingInventory />}
+            {activeView === 'services' && <DesignServicesView />}
           </div>
         </div>
       </div>

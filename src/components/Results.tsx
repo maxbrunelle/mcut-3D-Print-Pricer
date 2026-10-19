@@ -3,6 +3,7 @@ import { useAppContext } from '../lib/store';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AnimatedNumber } from './AnimatedNumber';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export function Results() {
   const { state, updateState } = useAppContext();
@@ -21,6 +22,7 @@ export function Results() {
     state.packagingCost,
     state.shippingCost,
     state.extraItems,
+    state.designTasks,
     state.discountValue,
     state.discountType,
     state.applyTaxes,
@@ -91,6 +93,7 @@ export function Results() {
   const laborCost = (totalLaborTimeMin / 60) * (state.laborRatePerHour || 0);
   
   const extraItemsTotal = (state.extraItems || []).reduce((sum, item) => sum + ((item.quantity || 0) * (item.price || 0)), 0);
+  const designTasksTotal = (state.designTasks || []).reduce((sum, task) => sum + ((task.timeHrs || 0) + (task.timeMin || 0)/60) * (task.pricePerHour || 0), 0);
 
   const baseCost = totalMaterialCost + electricityCost + laborCost + machineCost + (state.hardwareCost || 0) + (state.packagingCost || 0);
   const failureCost = baseCost * (state.failureRate / 100);
@@ -99,7 +102,7 @@ export function Results() {
   const calculateTotal = (margin: number) => {
     if (state.isInHouseJob) return 0;
     const markupAmount = subtotal * (margin / 100);
-    let preTaxTotal = subtotal + markupAmount + (state.shippingCost || 0) + extraItemsTotal;
+    let preTaxTotal = subtotal + markupAmount + (state.shippingCost || 0) + extraItemsTotal + designTasksTotal;
     
     // Calculate discount
     const discountVal = state.discountValue || 0;
@@ -117,7 +120,7 @@ export function Results() {
   const calculatePreTax = (margin: number) => {
     if (state.isInHouseJob) return 0;
     const markupAmount = subtotal * (margin / 100);
-    let preTaxTotal = subtotal + markupAmount + (state.shippingCost || 0) + extraItemsTotal;
+    let preTaxTotal = subtotal + markupAmount + (state.shippingCost || 0) + extraItemsTotal + designTasksTotal;
     const discountVal = state.discountValue || 0;
     if (state.discountType === 'percentage') {
       preTaxTotal = preTaxTotal * (1 - discountVal / 100);
@@ -289,7 +292,7 @@ export function Results() {
     
     // Total for the whole project pre-tax based on margin
     const subtotalRaw = state.isInHouseJob ? 0 : subtotal * (1 + activeMargin / 100);
-    const tableSubtotal = state.isInHouseJob ? 0 : subtotalRaw + extraItemsTotal;
+    const tableSubtotal = state.isInHouseJob ? 0 : subtotalRaw + extraItemsTotal + designTasksTotal;
     const preTaxProjectTotal = calculatePreTax(activeMargin);
     const finalBatchTotal = calculateTotal(activeMargin);
     const gstAmount = state.applyTaxes ? preTaxProjectTotal * (state.gstRate / 100) : 0;
@@ -347,6 +350,22 @@ export function Results() {
             `Extra: ${item.name}`.replace(/[^\x00-\x7F]/g, ''),
             qty.toString(),
             `${cSym}${price.toFixed(2)}`,
+            `${cSym}${amount.toFixed(2)}`
+          ]);
+        }
+      });
+    }
+
+    if (state.designTasks && state.designTasks.length > 0) {
+      state.designTasks.forEach((task) => {
+        if (task.name) {
+          const totalHours = (task.timeHrs || 0) + (task.timeMin || 0) / 60;
+          const price = task.pricePerHour || 0;
+          const amount = totalHours * price;
+          tableBody.push([
+            `CAD/Scan: ${task.name}`.replace(/[^\x00-\x7F]/g, ''),
+            `${totalHours.toFixed(2)} hrs`,
+            `${cSym}${price.toFixed(2)}/hr`,
             `${cSym}${amount.toFixed(2)}`
           ]);
         }
@@ -625,7 +644,7 @@ export function Results() {
 
   return (
     <div className={`bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/40 dark:border-slate-700/40 p-6 md:p-8 transition-all duration-300 ${isCalculating ? 'opacity-70 scale-[0.99]' : 'opacity-100 scale-100'}`}>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-800 dark:text-slate-100 drop-shadow-sm"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           <h2 className="text-lg font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Suggested Pricing</h2>
@@ -744,7 +763,67 @@ export function Results() {
           <span>{activeMargin}% profit margin</span>
         </div>
         
-        <div className="flex gap-3">
+        
+      <div className="mt-8 pt-6 border-t border-white/40 dark:border-slate-700/40">
+        <div className="flex items-center gap-2 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-700 dark:text-slate-300 drop-shadow-sm"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          <h3 className="font-bold text-slate-700 dark:text-slate-200">Cost Breakdown</h3>
+        </div>
+        
+        <div className="h-48 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={[
+                  { name: 'Material', value: totalMaterialCost, color: '#3b82f6' },
+                  { name: 'CAD/Scan', value: designTasksTotal, color: '#f43f5e' },
+                  { name: 'Labor', value: laborCost, color: '#8b5cf6' },
+                  { name: 'Machine', value: machineCost, color: '#06b6d4' },
+                  { name: 'Electricity', value: electricityCost, color: '#f59e0b' },
+                  { name: 'Hardware', value: state.hardwareCost || 0, color: '#64748b' },
+                  { name: 'Packaging', value: state.packagingCost || 0, color: '#ec4899' },
+                  { name: 'Failure', value: failureCost, color: '#ef4444' }
+                ].filter(d => d.value > 0)}
+                cx="50%"
+                cy="50%"
+                innerRadius={50}
+                outerRadius={70}
+                paddingAngle={2}
+                dataKey="value"
+                stroke="none"
+              >
+                {
+                  [
+                    { name: 'Material', value: totalMaterialCost, color: '#3b82f6' },
+                  { name: 'CAD/Scan', value: designTasksTotal, color: '#f43f5e' },
+                    { name: 'Labor', value: laborCost, color: '#8b5cf6' },
+                    { name: 'Machine', value: machineCost, color: '#06b6d4' },
+                    { name: 'Electricity', value: electricityCost, color: '#f59e0b' },
+                    { name: 'Hardware', value: state.hardwareCost || 0, color: '#64748b' },
+                    { name: 'Packaging', value: state.packagingCost || 0, color: '#ec4899' },
+                    { name: 'Failure', value: failureCost, color: '#ef4444' }
+                  ].filter(d => d.value > 0).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))
+                }
+              </Pie>
+              <RechartsTooltip 
+                formatter={(value: number) => `${cSym}${value.toFixed(2)}`}
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
+                itemStyle={{ color: '#1e293b', fontWeight: 600 }}
+              />
+              <Legend 
+                layout="vertical" 
+                verticalAlign="middle" 
+                align="right"
+                wrapperStyle={{ fontSize: '11px', color: '#64748b' }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+        <div className="flex gap-3 flex-wrap">
           {state.editingInvoiceId && (
             <button
               onClick={() => updateState({ editingInvoiceId: null })}

@@ -1,24 +1,17 @@
 const fs = require('fs');
+let code = fs.readFileSync('src/components/Sidebar.tsx', 'utf8');
 
-let sidebarCode = fs.readFileSync('src/components/Sidebar.tsx', 'utf8');
+const targetMenu = `    { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'tasks', label: 'Tasks', icon: Wrench },
+  ];`;
 
-// Add imports
-if (!sidebarCode.includes('InventoryAlerts')) {
-  sidebarCode = sidebarCode.replace(
-    /import \{ useAppContext \} from '\.\.\/lib\/store';/,
-    "import { useAppContext } from '../lib/store';\nimport { InventoryAlerts } from './InventoryAlerts';\nimport { Settings } from './Settings';"
-  );
-}
+const replacementMenu = `    { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'tasks', label: 'Tasks', icon: Wrench },
+    { id: 'services', label: 'CAD & Scanning', icon: PenTool },
+  ];`;
 
-// Replace the lower section
-const lowerSection = `<div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50 flex flex-col gap-1">
-        <InventoryAlerts />
-        <Settings />
-      </div>`;
+code = code.replace("Wrench,", "Wrench,\n  PenTool,");
+code = code.replace(targetMenu, replacementMenu);
 
-sidebarCode = sidebarCode.replace(
-  /<div className="p-4 border-t border-slate-200\/50 dark:border-slate-700\/50 flex flex-col gap-3">[\s\S]*?<div className="text-xs text-slate-500 dark:text-slate-400 text-center font-medium">\s*v1\.0\.0\s*<\/div>\s*<\/div>/,
-  lowerSection
-);
-
-fs.writeFileSync('src/components/Sidebar.tsx', sidebarCode);
+fs.writeFileSync('src/components/Sidebar.tsx', code);
+console.log("Updated Sidebar.tsx");

@@ -63,7 +63,7 @@ export function Settings() {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white"
+        className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white"
         title="Settings"
       >
         <SettingsIcon size={18} className="text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200" />
@@ -77,18 +77,18 @@ export function Settings() {
               initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
               animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
               exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
-              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-0 md:p-4"
             >
               <motion.div 
                 initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
                 animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
                 exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
                 transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
-                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-0 w-full max-w-4xl h-[700px] max-h-[90vh] overflow-hidden flex flex-col md:flex-row"
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl md:rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border-0 md:border border-white/80 dark:border-slate-700/80 p-0 w-full max-w-4xl h-[100dvh] md:h-[700px] max-h-[100dvh] md:max-h-[90vh] overflow-hidden flex flex-col md:flex-row"
               >
                 {/* Sidebar */}
-                <div className="w-full md:w-64 bg-slate-50/50 dark:bg-slate-800/50 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700/50 p-6 flex flex-col flex-shrink-0">
-                  <div className="flex justify-between items-center mb-8">
+                <div className="w-full md:w-64 bg-slate-50/50 dark:bg-slate-800/50 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700/50 pt-6 p-4 md:p-6 flex flex-col flex-shrink-0">
+                  <div className="flex justify-between items-center mb-4 md:mb-8">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-2">
                       <SettingsIcon size={24} className="text-blue-500" /> Settings
                     </h3>
@@ -103,7 +103,7 @@ export function Settings() {
                   <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 custom-scrollbar">
                     <button
                       onClick={() => setActiveTab('business')}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 ${
                         activeTab === 'business' 
                           ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' 
                           : 'text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-700/60'
@@ -113,7 +113,7 @@ export function Settings() {
                     </button>
                     <button
                       onClick={() => setActiveTab('defaults')}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 ${
                         activeTab === 'defaults' 
                           ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' 
                           : 'text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-700/60'
@@ -123,7 +123,7 @@ export function Settings() {
                     </button>
                     <button
                       onClick={() => setActiveTab('appearance')}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 ${
                         activeTab === 'appearance' 
                           ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' 
                           : 'text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-700/60'
@@ -133,7 +133,7 @@ export function Settings() {
                     </button>
                     <button
                       onClick={() => setActiveTab('animations')}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 ${
                         activeTab === 'animations' 
                           ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' 
                           : 'text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-700/60'
@@ -143,7 +143,7 @@ export function Settings() {
                     </button>
                     <button
                       onClick={() => setActiveTab('data')}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 ${
                         activeTab === 'data' 
                           ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' 
                           : 'text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-700/60'
@@ -155,7 +155,7 @@ export function Settings() {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col relative">
+                <div key={activeTab} className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 pb-12 md:pb-8 flex flex-col relative">
                   <button 
                     onClick={() => setIsOpen(false)}
                     className="hidden md:block absolute top-6 right-6 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50 z-10"
@@ -195,7 +195,7 @@ export function Settings() {
                                 placeholder="123 Main St"
                               />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">City</label>
                                 <input 
@@ -215,7 +215,7 @@ export function Settings() {
                                 />
                               </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">ZIP / Postal Code</label>
                                 <input 
@@ -424,6 +424,29 @@ export function Settings() {
                                   />
                                 </div>
                               </div>
+
+                              <h5 className="font-semibold text-slate-700 dark:text-slate-200 mt-6 mb-3 text-sm">CAD & Scanning Rates</h5>
+                              <div className="space-y-3">
+                                {state.inventoryDesignServices?.map(service => (
+                                  <div key={service.id} className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                                    <div>
+                                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">{service.name} Rate (per hr)</label>
+                                      <input 
+                                        type="number" 
+                                        min="0" step="1"
+                                        value={service.pricePerHour}
+                                        onChange={e => {
+                                          const newServices = state.inventoryDesignServices?.map(s => 
+                                            s.id === service.id ? { ...s, pricePerHour: parseFloat(e.target.value) || 0 } : s
+                                          );
+                                          updateState({ inventoryDesignServices: newServices });
+                                        }}
+                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -440,7 +463,7 @@ export function Settings() {
                             <Palette size={20} className="text-blue-500" /> Theme Configuration
                           </h4>
                           <div className="bg-white/60 dark:bg-slate-800/60 p-5 rounded-2xl border border-white/80 dark:border-slate-700/80 shadow-sm">
-                            <div className="flex justify-between items-center mb-6">
+                            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                               <div>
                                 <h5 className="font-semibold text-slate-700 dark:text-slate-200">Color Mode</h5>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Switch between light and dark environments.</p>
@@ -458,7 +481,7 @@ export function Settings() {
                             
                             <div>
                               <h5 className="font-semibold text-slate-700 dark:text-slate-200 mb-4">Color Palette</h5>
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {Object.keys(THEMES).map((themeKey) => (
                                   <button
                                     key={themeKey}
@@ -572,7 +595,7 @@ export function Settings() {
                         </p>
 
                         <div className="bg-white/60 dark:bg-slate-800/60 p-3 rounded-2xl border border-white/80 dark:border-slate-700/80 shadow-sm divide-y divide-slate-100 dark:divide-slate-700/50">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
+                          <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between p-4 gap-4">
                             <div>
                               <h5 className="font-semibold text-slate-700 dark:text-slate-200">Popups & Modals</h5>
                               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Enable scale and fade effects when opening dialogs.</p>
@@ -588,7 +611,7 @@ export function Settings() {
                             </label>
                           </div>
                           
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
+                          <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between p-4 gap-4">
                             <div>
                               <h5 className="font-semibold text-slate-700 dark:text-slate-200">Animated Numbers</h5>
                               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Animate numbers counting up or down when values change.</p>
@@ -604,7 +627,7 @@ export function Settings() {
                             </label>
                           </div>
                           
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
+                          <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between p-4 gap-4">
                             <div>
                               <h5 className="font-semibold text-slate-700 dark:text-slate-200">Job Tracker Effects</h5>
                               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Enable fluid drag-and-drop animations and completion effects.</p>
@@ -620,7 +643,7 @@ export function Settings() {
                             </label>
                           </div>
                           
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
+                          <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between p-4 gap-4">
                             <div>
                               <h5 className="font-semibold text-slate-700 dark:text-slate-200">Fluid Layouts</h5>
                               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Animate structural changes like adding or removing items.</p>

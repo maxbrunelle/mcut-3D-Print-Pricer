@@ -1,4 +1,4 @@
-import { Calendar } from "lucide-react";
+import { Calendar, Plus, Trash2, PenTool } from "lucide-react";
 import { SpoolCombobox } from "./SpoolCombobox";
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
@@ -13,6 +13,8 @@ export function Calculator() {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showManageCustomersModal, setShowManageCustomersModal] = useState(false);
   const [showExtraItemsModal, setShowExtraItemsModal] = useState(false);
+  const [showTasksModal, setShowTasksModal] = useState(false);
+  const [showDesignServicesModal, setShowDesignServicesModal] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [editingCustomerId, setEditingCustomerId] = useState<string | null>(null);
   const [newCustomerName, setNewCustomerName] = useState('');
@@ -223,6 +225,46 @@ export function Calculator() {
     updateState({ extraItems: [...(state.extraItems || []), newItem] });
   };
 
+  
+  const addDesignTask = () => {
+    const newTask = {
+      id: Math.random().toString(),
+      name: '',
+      timeHrs: 1,
+      timeMin: 0,
+      pricePerHour: 50
+    };
+    updateState({ designTasks: [...(state.designTasks || []), newTask] });
+  };
+
+  const addInventoryDesignTask = (inventoryServiceId: string) => {
+    const invService = state.inventoryDesignServices?.find(i => i.id === inventoryServiceId);
+    if (!invService) return;
+    
+    const newTask = {
+      id: Math.random().toString(),
+      name: invService.name,
+      timeHrs: 1,
+      timeMin: 0,
+      pricePerHour: invService.pricePerHour,
+      inventoryServiceId: invService.id
+    };
+    updateState({ designTasks: [...(state.designTasks || []), newTask] });
+  };
+
+  const removeDesignTask = (taskId: string) => {
+    updateState({ 
+      designTasks: state.designTasks?.filter(i => i.id !== taskId) || [] 
+    });
+  };
+
+  const handleDesignTaskChange = (taskId: string, field: string, value: any) => {
+    const newTasks = state.designTasks?.map(i => 
+      i.id === taskId ? { ...i, [field]: value } : i
+    ) || [];
+    updateState({ designTasks: newTasks });
+  };
+
   const removeExtraItem = (itemId: string) => {
     updateState({ 
       extraItems: state.extraItems?.filter(i => i.id !== itemId) || [] 
@@ -238,7 +280,7 @@ export function Calculator() {
 
   return (
     <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/40 dark:border-slate-700/40 p-6 md:p-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
         <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">Print Calculator</h2>
         <button 
           onClick={handleClearForm}
@@ -261,20 +303,18 @@ export function Calculator() {
               <Calendar size={16} className="text-blue-500" />
               Target Schedule Date
             </label>
-            <input type="date" name="dueDate" value={state.dueDate || ''} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
+            <input type="date"
+                                      name="dueDate" value={state.dueDate || ''} onChange={handleChange} className="min-w-0 max-w-full appearance-none w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
           </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Due / Scheduled Date</label>
-            <input type="date" name="dueDate" value={state.dueDate || ''} onChange={handleChange} className="w-full px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 transition-all duration-300 text-slate-800 dark:text-white" />
-          </div>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* CUSTOMER SELECTION */}
           <div className="md:col-span-2">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-2 gap-2">
               <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Customer</label>
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-wrap">
                 <button 
                   onClick={() => setShowManageCustomersModal(true)}
                   className="text-xs text-slate-600 dark:text-slate-300 font-medium hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 flex items-center gap-1 transition-colors"
@@ -301,7 +341,7 @@ export function Calculator() {
 
         {/* PROJECT PARTS */}
         <div className="pt-6 border-t border-white/30 dark:border-slate-700/50">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-4 gap-4">
             <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">Project Parts</h3>
             <button 
               onClick={addPart}
@@ -327,11 +367,11 @@ export function Calculator() {
                   className={`p-4 flex items-center justify-between cursor-pointer hover:bg-white/50 dark:bg-slate-800/50 transition-colors ${expandedPartId === part.id ? 'bg-white/50 dark:bg-slate-800/50' : ''}`}
                   onClick={() => setExpandedPartId(expandedPartId === part.id ? null : part.id)}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="w-6 h-6 rounded-full bg-slate-200/50 dark:bg-slate-700/50 flex items-center justify-center text-xs font-bold text-slate-500 dark:text-slate-400">
                       {partIndex + 1}
                     </div>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">{part.name || `Unnamed Part ${partIndex + 1}`}</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-200 truncate">{part.name || `Unnamed Part ${partIndex + 1}`}</span>
                     <span className="text-xs text-slate-400 bg-white/50 dark:bg-slate-800/50 px-2 py-0.5 rounded-full border border-white/40 dark:border-slate-700/40">
                       x{part.quantity}
                     </span>
@@ -528,20 +568,33 @@ export function Calculator() {
 
         {/* Post-Processing Tasks Section */}
         <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/60 dark:border-slate-700/60 mb-6">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
+            
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-3">
               <div className="p-2 bg-blue-500/10 rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
               </div>
               Post-Processing Tasks
             </h2>
-            <button 
-              onClick={addPostProcessingTask}
-              className="text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 border border-blue-200/50 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors font-medium"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-              Add Task
-            </button>
+            <div className="flex items-center gap-2">
+              {state.inventoryPostProcessingTasks && state.inventoryPostProcessingTasks.length > 0 && (
+                <button
+                  onClick={() => setShowTasksModal(true)}
+                  className="text-xs text-slate-600 dark:text-slate-300 font-medium hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg border border-white/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:hover:bg-slate-700/50 shadow-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  From List
+                </button>
+              )}
+              <button 
+                onClick={addPostProcessingTask}
+                className="text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 border border-blue-200/50 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors font-medium"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                Add Custom Task
+              </button>
+            </div>
+
           </div>
 
           <div className="space-y-3">
@@ -593,7 +646,7 @@ export function Calculator() {
 
         {/* Extra Items Section */}
         <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/60 dark:border-slate-700/60 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+          <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
             <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-3">
               <div className="p-2 bg-purple-500/10 rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
@@ -676,7 +729,103 @@ export function Calculator() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+        {/* CAD & Scanning Services Section */}
+        <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl p-5 border border-white/60 dark:border-slate-700/60 shadow-sm transition-all duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <PenTool size={18} className="text-blue-500" />
+              CAD & Scanning Services
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {state.inventoryDesignServices && state.inventoryDesignServices.length > 0 && (
+                <button
+                  onClick={() => setShowDesignServicesModal(true)}
+                  className="text-xs text-slate-600 dark:text-slate-300 font-medium hover:text-slate-800 dark:hover:text-slate-100 dark:text-slate-100 flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg border border-white/60 dark:border-slate-700/60 bg-white/50 dark:bg-slate-800/50 hover:bg-white/70 dark:hover:bg-slate-700/50 shadow-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  From List
+                </button>
+              )}
+              <button 
+                onClick={addDesignTask}
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800/60 rounded-xl transition-colors text-sm font-medium"
+              >
+                <Plus size={14} /> Custom Service
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {state.designTasks?.length > 0 ? (
+              <AnimatePresence>
+              {state.designTasks.map((task) => (
+                <motion.div 
+                  key={task.id} 
+                  layout={state.animationsEnabled?.layouts !== false}
+                  initial={state.animationsEnabled?.layouts !== false ? { opacity: 0, x: -10 } : false}
+                  animate={state.animationsEnabled?.layouts !== false ? { opacity: 1, x: 0 } : false}
+                  exit={state.animationsEnabled?.layouts !== false ? { opacity: 0, scale: 0.95 } : false}
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-white/50 dark:bg-slate-800/50 p-3 rounded-2xl border border-white/60 dark:border-slate-700/60 group relative"
+                >
+                  <button 
+                    onClick={() => removeDesignTask(task.id)}
+                    className="absolute -top-2 -right-2 sm:static sm:-top-0 sm:-right-0 p-2 sm:p-2 bg-white dark:bg-slate-800 sm:bg-transparent sm:dark:bg-transparent text-slate-400 hover:text-red-500 rounded-full sm:rounded-xl hover:bg-red-50 sm:hover:bg-red-50 dark:hover:bg-red-900/30 shadow-md sm:shadow-none opacity-0 group-hover:opacity-100 transition-all shrink-0 focus:opacity-100 z-10"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                  <div className="flex-1 flex flex-col sm:flex-row gap-3 w-full">
+                    <div className="flex-1">
+                      <input 
+                        type="text" 
+                        value={task.name} 
+                        onChange={e => handleDesignTaskChange(task.id, 'name', e.target.value)}
+                        placeholder="Service Name (e.g., CAD Design)"
+                        className="w-full bg-transparent border-none focus:ring-0 text-sm font-semibold text-slate-700 dark:text-slate-200 placeholder:text-slate-400 px-0 py-2"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="w-24 relative">
+                        <input 
+                          type="number" min="0" step="1" 
+                          value={task.timeHrs || ''} 
+                          onChange={e => handleDesignTaskChange(task.id, 'timeHrs', e.target.valueAsNumber || 0)}
+                          className="w-full pl-3 pr-8 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs">h</span>
+                      </div>
+                      <div className="w-24 relative">
+                        <input 
+                          type="number" min="0" max="59" step="1" 
+                          value={task.timeMin || ''} 
+                          onChange={e => handleDesignTaskChange(task.id, 'timeMin', e.target.valueAsNumber || 0)}
+                          className="w-full pl-3 pr-10 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-xs">min</span>
+                      </div>
+                      <div className="w-28 relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-sm">$</span>
+                        <input 
+                          type="number" min="0" step="0.01" 
+                          value={task.pricePerHour || ''} 
+                          onChange={e => handleDesignTaskChange(task.id, 'pricePerHour', e.target.valueAsNumber || 0)}
+                          className="w-full pl-7 pr-3 py-2 bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-inner rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:bg-white/70 dark:focus:bg-slate-700/50 text-sm text-slate-800 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+              </AnimatePresence>
+            ) : (
+              <div className="text-center py-6 bg-white/30 dark:bg-slate-800/40 rounded-2xl border border-white/40 dark:border-slate-700/40 border-dashed">
+                <p className="text-sm text-slate-500 dark:text-slate-400">No CAD or scanning services added.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6 items-end">
           {/* LABOR TIME */}
           <div>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Labor Time</label>
@@ -739,7 +888,7 @@ export function Calculator() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
           {/* HARDWARE COST */}
           <div>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wider">Hardware Cost</label>
@@ -885,7 +1034,7 @@ export function Calculator() {
                 transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
                 className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-md flex flex-col"
               >
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
                   <div className="flex items-center gap-3">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">
                       {editingCustomerId ? 'Edit Customer' : 'Add New Customer'}
@@ -929,7 +1078,7 @@ export function Calculator() {
                   placeholder="123 3D Street" 
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">City</label>
                   <input
@@ -951,7 +1100,7 @@ export function Calculator() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1 uppercase tracking-wider">Zip/Postal Code</label>
                   <input
@@ -975,7 +1124,7 @@ export function Calculator() {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex justify-end gap-3 flex-wrap">
               <button 
                 onClick={() => {
                   setShowCustomerModal(false);
@@ -1065,7 +1214,7 @@ export function Calculator() {
                 transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
                 className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-2xl flex flex-col max-h-[80vh]"
               >
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
                   <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm">Manage Customers</h3>
                   <button 
                     onClick={() => setShowManageCustomersModal(false)}
@@ -1080,16 +1229,16 @@ export function Calculator() {
               ) : (
                 state.customers.map(c => (
                   <div key={c.id} className="bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 p-4 rounded-2xl flex justify-between items-center shadow-sm hover:shadow-md transition-shadow">
-                    <div>
-                      <div className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                    <div className="min-w-0 pr-2">
+                      <div className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2 truncate">
                         {c.name} 
                         {c.clientNumber && <span className="text-xs font-normal text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700">#{c.clientNumber}</span>}
                       </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">
                         {[c.street, c.city, c.state, c.country].filter(Boolean).join(', ')}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => {
                           setEditingCustomerId(c.id);
@@ -1140,6 +1289,138 @@ export function Calculator() {
         </AnimatePresence>,
         document.body
       )}
+      
+      {/* Post-Processing Tasks Modal */}
+      {createPortal(
+        <AnimatePresence>
+          {showTasksModal && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-2xl flex flex-col max-h-[80vh]"
+              >
+                <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    Select Post-Processing Task
+                  </h3>
+                  <button 
+                    onClick={() => setShowTasksModal(false)}
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {state.inventoryPostProcessingTasks?.length === 0 ? (
+                     <div className="col-span-full py-8 text-center text-slate-500 dark:text-slate-400 bg-white/30 dark:bg-slate-800/30 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
+                        No tasks in list. You can add them from the Tasks view in the sidebar.
+                     </div>
+                  ) : (
+                    state.inventoryPostProcessingTasks?.map(task => (
+                      <div 
+                        key={task.id} 
+                        className="bg-white/60 dark:bg-slate-800/60 p-4 rounded-xl border border-white/80 dark:border-slate-700/60 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600/50 transition-all group flex items-center justify-between cursor-pointer"
+                        onClick={() => {
+                          const newTask = {
+                            id: Math.random().toString(),
+                            name: task.name,
+                            timeMin: task.timeMin,
+                          };
+                          updateState({ postProcessingTasks: [...(state.postProcessingTasks || []), newTask] });
+                          setShowTasksModal(false);
+                        }}
+                      >
+                        <div>
+                          <div className="font-bold text-slate-800 dark:text-slate-100">{task.name}</div>
+                          <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">{task.timeMin} mins</div>
+                        </div>
+                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+            {/* CAD & Scanning Services Modal */}
+      {createPortal(
+        <AnimatePresence>
+          {showDesignServicesModal && (
+            <motion.div 
+              initial={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              animate={state.animationsEnabled?.popups !== false ? { opacity: 1 } : false}
+              exit={state.animationsEnabled?.popups !== false ? { opacity: 0 } : false}
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+            >
+              <motion.div 
+                initial={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                animate={state.animationsEnabled?.popups !== false ? { scale: 1, opacity: 1 } : false}
+                exit={state.animationsEnabled?.popups !== false ? { scale: 0.95, opacity: 0 } : false}
+                transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-2xl flex flex-col max-h-[80vh]"
+              >
+                <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-2">
+                    <PenTool size={20} className="text-blue-500" />
+                    Select Service
+                  </h3>
+                  <button 
+                    onClick={() => setShowDesignServicesModal(false)}
+                    className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-slate-100 transition-colors p-2 rounded-full hover:bg-white/50 dark:bg-slate-800/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {state.inventoryDesignServices?.length === 0 ? (
+                     <div className="col-span-full py-8 text-center text-slate-500 dark:text-slate-400 bg-white/30 dark:bg-slate-800/30 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
+                        No services in list. You can add them from Settings.
+                     </div>
+                  ) : (
+                    state.inventoryDesignServices?.map(service => (
+                      <div 
+                        key={service.id} 
+                        className="bg-white/60 dark:bg-slate-800/60 p-4 rounded-xl border border-white/80 dark:border-slate-700/60 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600/50 transition-all group flex items-center justify-between cursor-pointer"
+                        onClick={() => {
+                          addInventoryDesignTask(service.id);
+                          setShowDesignServicesModal(false);
+                        }}
+                      >
+                        <div>
+                          <div className="font-bold text-slate-800 dark:text-slate-100">{service.name}</div>
+                          <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">${service.pricePerHour}/hr</div>
+                        </div>
+                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-500 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                          <Plus size={16} />
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
       {/* Extra Items Modal */}
       {createPortal(
         <AnimatePresence>
@@ -1157,7 +1438,7 @@ export function Calculator() {
                 transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
                 className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-2xl flex flex-col max-h-[80vh]"
               >
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row flex-wrap sm:items-center justify-between mb-6 gap-4">
                   <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 drop-shadow-sm flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
                     Select Extra Item
@@ -1180,11 +1461,11 @@ export function Calculator() {
                   }}
                   className="bg-white/50 dark:bg-slate-800/50 border border-white/60 dark:border-slate-700/60 shadow-sm hover:bg-white/70 dark:hover:bg-slate-700/50 hover:border-purple-300 p-4 rounded-2xl flex justify-between items-center transition-all text-left group"
                 >
-                  <div>
-                    <div className="font-bold text-slate-800 dark:text-slate-100">{item.name}</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">${item.price.toFixed(2)}</div>
+                  <div className="min-w-0 pr-2">
+                    <div className="font-bold text-slate-800 dark:text-slate-100 truncate">{item.name}</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400 truncate">${item.price.toFixed(2)}</div>
                   </div>
-                  <div className="p-2 bg-purple-500/10 text-purple-600 border border-purple-200/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="p-2 bg-purple-500/10 text-purple-600 border border-purple-200/50 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                   </div>
                 </button>
@@ -1224,7 +1505,7 @@ export function Calculator() {
                 <p className="text-slate-600 dark:text-slate-300 mb-6">
                   Are you sure you want to clear the form? All unsaved changes will be lost.
                 </p>
-                <div className="flex gap-4 justify-end">
+                <div className="flex gap-4 justify-end flex-wrap">
                   <button
                     onClick={() => setShowClearConfirm(false)}
                     className="px-6 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"

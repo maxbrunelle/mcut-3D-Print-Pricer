@@ -92,13 +92,13 @@ export function CustomersView() {
         <div className="flex flex-col md:flex-row gap-6">
           <div className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-md rounded-2xl p-6 border border-white/60 dark:border-slate-700/60 shadow-sm md:w-1/3 shrink-0 self-start">
             <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{selectedCustomer.name}</h2>
+              <div className="min-w-0 pr-2">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 truncate">{selectedCustomer.name}</h2>
                 <span className="text-sm font-medium text-slate-500 dark:text-slate-400">#{selectedCustomer.clientNumber}</span>
               </div>
               <button 
                 onClick={(e) => handleEditClick(e, selectedCustomer)}
-                className="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                className="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shrink-0"
                 title="Edit Customer"
               >
                 <Edit2 size={16} />
@@ -116,7 +116,7 @@ export function CustomersView() {
               </div>
             </div>
             
-            <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-white/50 dark:bg-slate-700/50 p-4 rounded-xl text-center">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{customerInvoices.length}</div>
                 <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Quotes</div>
@@ -184,7 +184,7 @@ export function CustomersView() {
 
   return (
     <div className="h-full flex flex-col space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-between items-start sm:items-center">
         <div className="relative max-w-md w-full">
           <input
             type="text"
@@ -231,7 +231,7 @@ export function CustomersView() {
                   </div>
                   <button 
                     onClick={(e) => handleEditClick(e, customer)}
-                    className="p-1.5 bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                    className="p-1.5 bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all"
                   >
                     <Edit2 size={14} />
                   </button>
@@ -330,7 +330,7 @@ function CustomerModal({ isOpen, onClose, formData, setFormData, onSave, isEditi
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">City</label>
                 <input 
@@ -353,7 +353,7 @@ function CustomerModal({ isOpen, onClose, formData, setFormData, onSave, isEditi
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">ZIP/Postal Code</label>
                 <input 
@@ -377,7 +377,7 @@ function CustomerModal({ isOpen, onClose, formData, setFormData, onSave, isEditi
             </div>
           </div>
           
-          <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-end gap-3">
+          <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-end gap-3 flex-wrap">
             <button 
               onClick={onClose}
               className="px-5 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"

@@ -2,6 +2,12 @@ node_modules
 dist
 dist-ssr
 dist_electron
+installer_release
+installer_release/
+*.exe
+*.dll
+*.pak
+*.asar
 *.local
 .env
 .env.*

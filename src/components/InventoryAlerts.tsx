@@ -96,7 +96,7 @@ export function InventoryAlerts() {
                 transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
                 className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] border border-white/80 dark:border-slate-700/80 p-6 md:p-8 w-full max-w-4xl max-h-[90vh] flex flex-col"
               >
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
                   <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 drop-shadow-sm">
                     <Bell size={24} className="text-rose-500" />
                     <h2 className="text-xl font-bold uppercase tracking-widest text-slate-800 dark:text-slate-100 drop-shadow-sm">Inventory Alerts</h2>
@@ -110,7 +110,7 @@ export function InventoryAlerts() {
                 </div>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                 <div className="bg-rose-50/50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/50 rounded-2xl p-6 shadow-sm">
                   <h3 className="font-bold text-rose-700 dark:text-rose-400 mb-6 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-rose-500"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
@@ -125,14 +125,14 @@ export function InventoryAlerts() {
                     ) : (
                       lowSpools.map((spool) => (
                         <div key={spool.id} className="flex justify-between items-center bg-white/60 dark:bg-slate-800/60 p-3 rounded-xl border border-rose-100 dark:border-rose-900/30">
-                          <div className="flex items-center gap-3">
-                            <div className="w-4 h-4 rounded-full border border-slate-200" style={{ backgroundColor: spool.colorHex }}></div>
-                            <div>
-                              <div className="font-medium text-slate-800 dark:text-slate-100 text-sm">{spool.name}</div>
-                              <div className="text-xs text-slate-500 dark:text-slate-400">{spool.material} • {spool.color}</div>
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-4 h-4 rounded-full border border-slate-200 shrink-0" style={{ backgroundColor: spool.colorHex }}></div>
+                            <div className="min-w-0 pr-2">
+                              <div className="font-medium text-slate-800 dark:text-slate-100 text-sm truncate">{spool.name}</div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400 truncate">{spool.material} • {spool.color}</div>
                             </div>
                           </div>
-                          <div className="text-rose-600 dark:text-rose-400 font-bold text-sm">
+                          <div className="text-rose-600 dark:text-rose-400 font-bold text-sm shrink-0">
                             {spool.remainingWeight.toFixed(0)}g left
                           </div>
                         </div>
@@ -160,7 +160,7 @@ export function InventoryAlerts() {
                             <div className="text-xs text-slate-500 dark:text-slate-400">{cSym}{item.price.toFixed(2)}</div>
                           </div>
                           <div className="flex flex-col items-end gap-1">
-                            <div className="text-orange-600 dark:text-orange-400 font-bold text-sm">
+                            <div className="text-orange-600 dark:text-orange-400 font-bold text-sm shrink-0">
                               {item.quantity} left
                             </div>
                             {item.rebuyLink && (
@@ -177,7 +177,7 @@ export function InventoryAlerts() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-6">
                 <div className="bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/50 rounded-2xl p-6 shadow-sm">
                   <h3 className="font-bold text-indigo-700 dark:text-indigo-400 mb-6 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -230,13 +230,17 @@ export function InventoryAlerts() {
                         const [y, m, d] = inv.dueDate!.split('T')[0].split('-').map(Number);
                         const due = new Date(y, m - 1, d);
                         return (
-                          <div key={inv.id} className="flex justify-between items-center bg-white/60 dark:bg-slate-800/60 p-3 rounded-xl border border-fuchsia-100 dark:border-fuchsia-900/30">
+                          <div key={inv.id} className="flex justify-between items-center bg-white/60 dark:bg-slate-800/60 p-3 rounded-xl border border-fuchsia-100 dark:border-fuchsia-900/30 cursor-pointer hover:bg-white/80 dark:hover:bg-slate-800/80 transition-colors"
+                            onClick={() => {
+                              updateState({ activeView: 'scheduler', inspectingInvoiceId: inv.id });
+                              setIsOpen(false);
+                            }}>
                             <div>
                               <div className="font-medium text-slate-800 dark:text-slate-100 text-sm truncate max-w-[150px]">{inv.partName}</div>
                               <div className="text-xs text-slate-500 dark:text-slate-400">#{inv.invoiceNumber}</div>
                             </div>
                             <div className="flex flex-col items-end gap-1">
-                              <div className="text-fuchsia-600 dark:text-fuchsia-400 font-bold text-sm">
+                              <div className="text-fuchsia-600 dark:text-fuchsia-400 font-bold text-sm shrink-0">
                                 {due.toLocaleDateString([], { month: 'short', day: 'numeric' })}
                               </div>
                             </div>
